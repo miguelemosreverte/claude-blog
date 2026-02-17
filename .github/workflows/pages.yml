@@ -34,6 +34,7 @@ jobs:
           cp -r posts/images/* _site/posts/images/
           cp -r map _site/map
           cp -r map-data _site/map-data
+          cp -r map-frames _site/map-frames
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

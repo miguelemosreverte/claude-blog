@@ -3,27 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Eastern Front — Interactive Map</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<title>The Eastern Front 1941–1945 — Interactive Map</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0a0a0f; color: #ccc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
-  #map { width: 100%; height: calc(100vh - 80px); }
-  .leaflet-container { background: #0a0a0f; }
+  body { background: #0a0a0f; color: #ccc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-  /* Timeline bar */
+  /* Map frame */
+  #map-area {
+    flex: 1; position: relative; overflow: hidden; background: #0a0a0f;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #frame {
+    max-width: 100%; max-height: 100%; object-fit: contain;
+    transition: opacity 0.3s ease;
+  }
+  #frame.loading { opacity: 0.4; }
+
+  /* Preload hint */
+  #preload { display: none; }
+
+  /* Timeline */
   #timeline {
-    height: 80px; background: #111118; border-top: 1px solid #222;
+    height: 88px; background: #111118; border-top: 1px solid #222;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 8px 20px;
+    padding: 8px 20px; flex-shrink: 0;
   }
   #date-label {
-    font-size: 13px; color: #d4a853; letter-spacing: 0.15em; text-transform: uppercase;
-    margin-bottom: 4px; font-weight: 600; min-height: 20px; text-align: center;
+    font-size: 14px; color: #d4a853; letter-spacing: 0.15em; text-transform: uppercase;
+    font-weight: 600; min-height: 20px; text-align: center;
   }
-  #date-sublabel { font-size: 11px; color: #888; margin-bottom: 8px; min-height: 16px; text-align: center; }
+  #date-sublabel { font-size: 12px; color: #888; margin-bottom: 8px; min-height: 18px; text-align: center; }
+
   #slider-row { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 900px; }
+
   #timeline-slider {
     flex: 1; -webkit-appearance: none; appearance: none;
     height: 4px; background: #333; border-radius: 2px; outline: none; cursor: pointer;
@@ -31,181 +43,146 @@
   #timeline-slider::-webkit-slider-thumb {
     -webkit-appearance: none; width: 16px; height: 16px;
     background: #d4a853; border-radius: 50%; cursor: grab;
+    box-shadow: 0 0 6px rgba(212,168,83,0.4);
   }
+  #timeline-slider::-moz-range-thumb {
+    width: 16px; height: 16px; background: #d4a853; border-radius: 50%;
+    cursor: grab; border: none; box-shadow: 0 0 6px rgba(212,168,83,0.4);
+  }
+
   #play-btn {
-    width: 32px; height: 32px; background: none; border: 1px solid #555;
+    width: 36px; height: 36px; background: none; border: 1px solid #444;
     border-radius: 50%; color: #d4a853; cursor: pointer; font-size: 14px;
     display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s;
   }
   #play-btn:hover { border-color: #d4a853; }
-  .date-tick { font-size: 9px; color: #555; white-space: nowrap; }
 
-  /* City dots */
-  .city-dot {
-    border-radius: 50%; border: none; opacity: 0.8;
-  }
-  .city-label {
-    font-size: 9px; font-weight: 600; letter-spacing: 0.1em;
-    text-transform: uppercase; white-space: nowrap;
-    text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);
-  }
+  .date-range { font-size: 10px; color: #555; white-space: nowrap; letter-spacing: 0.1em; }
 
-  /* Loading */
-  #loading {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
-    background: #0a0a0f; display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 12px;
+  /* Tick marks */
+  #ticks {
+    display: flex; width: 100%; max-width: 900px; justify-content: space-between;
+    padding: 0 24px; margin-top: 4px;
   }
-  #loading p { color: #d4a853; font-size: 14px; letter-spacing: 0.2em; }
-  .spinner { width: 32px; height: 32px; border: 2px solid #333; border-top-color: #d4a853; border-radius: 50%; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .tick {
+    font-size: 8px; color: #444; letter-spacing: 0.05em; cursor: pointer;
+    transition: color 0.2s;
+  }
+  .tick:hover { color: #d4a853; }
+  .tick.active { color: #d4a853; font-weight: 600; }
+
+  /* Source link */
+  #source {
+    position: absolute; bottom: 96px; right: 12px; font-size: 10px;
+    color: #444; text-decoration: none; letter-spacing: 0.1em;
+    transition: color 0.2s;
+  }
+  #source:hover { color: #d4a853; }
 </style>
 </head>
 <body>
 
-<div id="loading"><div class="spinner"></div><p>Loading map data...</p></div>
+<div id="map-area">
+  <img id="frame" alt="Eastern Front Map">
+</div>
 
-<div id="map"></div>
+<a id="source" href="https://github.com/miguelemosreverte/ww2-map" target="_blank">SOURCE &rarr;</a>
+
 <div id="timeline">
   <div id="date-label"></div>
   <div id="date-sublabel"></div>
   <div id="slider-row">
-    <button id="play-btn" title="Play/Pause">&#9654;</button>
+    <button id="play-btn" title="Play/Pause (Space)">&#9654;</button>
+    <span class="date-range" id="date-start"></span>
     <input type="range" id="timeline-slider" min="0" max="25" value="0" step="1">
-    <span class="date-tick" id="date-range"></span>
+    <span class="date-range" id="date-end"></span>
   </div>
+  <div id="ticks"></div>
 </div>
 
-<script>
-const DATA_BASE = window.location.pathname.replace(/\/map\/?$/, '') + '/map-data';
-const AXIS_COLOR = '#6b7b8d';
-const SOVIET_COLOR = '#8b3a3a';
-const FRONT_COLOR = '#d4a853';
+<div id="preload"></div>
 
+<script>
+const FRAME_BASE = '../map-frames';
 let dates = [];
 let currentIdx = 0;
-let dateCache = {};
 let playing = false;
 let playTimer = null;
+let preloaded = {};
 
-// Leaflet map
-const map = L.map('map', {
-  center: [52, 32],
-  zoom: 5,
-  zoomControl: false,
-  attributionControl: false,
-});
-
-L.control.zoom({ position: 'topright' }).addTo(map);
-L.control.attribution({ position: 'bottomright', prefix: false }).addTo(map);
-
-L.tileLayer('https://basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap &copy; CARTO',
-  maxZoom: 10,
-  minZoom: 3,
-}).addTo(map);
-
-// Layers
-let frontLineLayer = null;
-let cityLayer = L.layerGroup().addTo(map);
-
+const frame = document.getElementById('frame');
 const slider = document.getElementById('timeline-slider');
 const dateLabel = document.getElementById('date-label');
 const dateSublabel = document.getElementById('date-sublabel');
-const dateRange = document.getElementById('date-range');
+const dateStart = document.getElementById('date-start');
+const dateEnd = document.getElementById('date-end');
 const playBtn = document.getElementById('play-btn');
+const ticksDiv = document.getElementById('ticks');
 
-async function fetchJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
-  return res.json();
-}
+async function init() {
+  const res = await fetch('../map-data/dates.json');
+  dates = await res.json();
 
-async function loadDateData(dateStr) {
-  if (dateCache[dateStr]) return dateCache[dateStr];
-  const data = await fetchJSON(`${DATA_BASE}/${dateStr}.json`);
-  dateCache[dateStr] = data;
-  return data;
-}
+  slider.max = dates.length - 1;
+  dateStart.textContent = dates[0].date.slice(0, 4);
+  dateEnd.textContent = dates[dates.length - 1].date.slice(0, 4);
 
-function renderDate(data) {
-  // Remove old front line
-  if (frontLineLayer) { map.removeLayer(frontLineLayer); frontLineLayer = null; }
-  cityLayer.clearLayers();
-
-  // Draw front line
-  if (data.contour && data.contour.geometry && data.contour.geometry.coordinates.length > 0) {
-    frontLineLayer = L.geoJSON(data.contour, {
-      style: {
-        color: FRONT_COLOR,
-        weight: 2.5,
-        opacity: 0.9,
-      },
-    }).addTo(map);
-  }
-
-  // Draw cities (major only at low zoom, all at higher zoom)
-  const zoom = map.getZoom();
-  const showAll = zoom >= 6;
-
-  for (const c of data.cities) {
-    if (!showAll && !c.major) continue;
-    const color = c.control === 'axis' ? AXIS_COLOR : SOVIET_COLOR;
-    const size = c.major ? 6 : 3;
-
-    const marker = L.circleMarker([c.lat, c.lon], {
-      radius: size,
-      fillColor: color,
-      fillOpacity: 0.8,
-      color: color,
-      weight: 0,
-    });
-
-    if (c.major) {
-      marker.bindTooltip(c.name, {
-        permanent: zoom >= 5,
-        direction: 'right',
-        offset: [8, 0],
-        className: 'city-label',
-      });
-    } else {
-      marker.bindTooltip(c.name, {
-        permanent: false,
-        direction: 'right',
-        offset: [6, 0],
-        className: 'city-label',
-      });
+  // Build year tick marks
+  const years = new Set();
+  dates.forEach((d, i) => {
+    const y = d.date.slice(0, 4);
+    if (!years.has(y)) {
+      years.add(y);
+      const tick = document.createElement('span');
+      tick.className = 'tick';
+      tick.textContent = y;
+      tick.onclick = () => goTo(i);
+      tick.dataset.idx = i;
+      ticksDiv.appendChild(tick);
     }
+  });
 
-    cityLayer.addLayer(marker);
+  // Preload all frames
+  for (const d of dates) {
+    const img = new Image();
+    img.src = `${FRAME_BASE}/${d.date}.png`;
+    preloaded[d.date] = img;
   }
 
-  // Update labels
-  dateLabel.textContent = data.label + '  —  ' + data.date;
-  dateSublabel.textContent = data.sublabel;
+  goTo(0);
 }
 
-async function goToIndex(idx) {
+function goTo(idx) {
   if (idx < 0 || idx >= dates.length) return;
   currentIdx = idx;
   slider.value = idx;
-  const data = await loadDateData(dates[idx].date);
-  renderDate(data);
+
+  const d = dates[idx];
+  dateLabel.textContent = d.label + '  \u2014  ' + d.date;
+  dateSublabel.textContent = d.sublabel;
+
+  // Update frame
+  const img = preloaded[d.date];
+  if (img && img.complete) {
+    frame.src = img.src;
+    frame.classList.remove('loading');
+  } else {
+    frame.classList.add('loading');
+    frame.src = `${FRAME_BASE}/${d.date}.png`;
+    frame.onload = () => frame.classList.remove('loading');
+  }
+
+  // Update ticks
+  const year = d.date.slice(0, 4);
+  document.querySelectorAll('.tick').forEach(t => {
+    const tickYear = t.textContent;
+    t.classList.toggle('active', tickYear === year);
+  });
 }
 
-// Re-render on zoom change (show/hide minor cities)
-map.on('zoomend', async () => {
-  if (dates.length > 0 && dateCache[dates[currentIdx].date]) {
-    renderDate(dateCache[dates[currentIdx].date]);
-  }
-});
+slider.addEventListener('input', () => goTo(parseInt(slider.value)));
 
-// Slider
-slider.addEventListener('input', () => {
-  goToIndex(parseInt(slider.value));
-});
-
-// Play/Pause
 playBtn.addEventListener('click', () => {
   playing = !playing;
   playBtn.innerHTML = playing ? '&#9646;&#9646;' : '&#9654;';
@@ -217,40 +194,20 @@ playBtn.addEventListener('click', () => {
         clearInterval(playTimer);
         return;
       }
-      goToIndex(currentIdx + 1);
+      goTo(currentIdx + 1);
     }, 2000);
   } else {
     clearInterval(playTimer);
   }
 });
 
-// Keyboard
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); goToIndex(currentIdx + 1); }
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); goToIndex(currentIdx - 1); }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); goTo(currentIdx + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); goTo(currentIdx - 1); }
   if (e.key === ' ') { e.preventDefault(); playBtn.click(); }
 });
 
-// Init
-(async () => {
-  try {
-    dates = await fetchJSON(`${DATA_BASE}/dates.json`);
-    slider.max = dates.length - 1;
-    dateRange.textContent = dates[0].date.slice(0, 4) + ' — ' + dates[dates.length - 1].date.slice(0, 4);
-
-    // Preload all dates (they're small)
-    await Promise.all(dates.map(d => loadDateData(d.date)));
-
-    // Show first date
-    await goToIndex(0);
-  } catch (err) {
-    dateLabel.textContent = 'Error loading data';
-    dateSublabel.textContent = err.message;
-    console.error(err);
-  } finally {
-    document.getElementById('loading').style.display = 'none';
-  }
-})();
+init();
 </script>
 </body>
 </html>
