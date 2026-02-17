@@ -46,23 +46,49 @@ let dates = [];
 let idx = 0;
 let imgs = {};
 
+let loopTimer = null;
+
 async function init() {
   const res = await fetch('../map-data/dates.json');
   dates = await res.json();
-  dates.forEach(d => { const i = new Image(); i.src = `${FRAME_BASE}/${d.date}.png`; imgs[d.date] = i; });
+  // Preload all frames
+  await Promise.all(dates.map(d => new Promise(resolve => {
+    const i = new Image();
+    i.onload = resolve;
+    i.onerror = resolve;
+    i.src = `${FRAME_BASE}/${d.date}.png`;
+    imgs[d.date] = i;
+  })));
   show(0);
+  startLoop();
 }
 
 function show(i) {
-  idx = Math.max(0, Math.min(dates.length - 1, i));
+  idx = ((i % dates.length) + dates.length) % dates.length;
   document.getElementById('frame').src = `${FRAME_BASE}/${dates[idx].date}.png`;
 }
 
 function go(delta) { show(idx + delta); }
 
+function startLoop() {
+  if (loopTimer) return;
+  const interval = Math.round(10000 / dates.length);
+  loopTimer = setInterval(() => show(idx + 1), interval);
+}
+
+function stopLoop() {
+  clearInterval(loopTimer);
+  loopTimer = null;
+}
+
 document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); go(1); }
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); go(-1); }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); stopLoop(); go(1); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); stopLoop(); go(-1); }
+});
+
+// Stop auto-loop on manual interaction, restart after 3s idle
+document.querySelectorAll('.nav').forEach(el => {
+  el.addEventListener('click', () => { stopLoop(); setTimeout(startLoop, 3000); });
 });
 
 init();
