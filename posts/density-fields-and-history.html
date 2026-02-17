@@ -200,6 +200,21 @@ tailwind.config = {
   <p class="font-body text-lg leading-relaxed mb-5">
     Manual fixes brought it down by hundreds at a time&mdash;122, then 319, then 317. But the pace was too slow. On February 10, a Rust optimizer with GPU acceleration was built. It searched for optimal city strengths to minimize failures across the entire timeline. The first run cut 2,264 failures (16,975 &rarr; 14,711). A second batch cut 898 more. By February 14, the engine was replaced with adaptive resolution&mdash;per-city kernel exponents that let dense front-line areas resolve correctly without disturbing the smooth visual rendering elsewhere.
   </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    Not every failure was solvable. The project's memory file contains a section titled "Intractable Failures (Don't Waste Time)":
+  </p>
+
+  <div class="code-block my-8">
+<pre>- Deep Don bend cities (Frolovo -23, Ilovlya -35):
+    massive Soviet rear influence
+- Volga east bank Soviet cities near Stalingrad:
+    overwhelmed by Axis field from opposite bank
+- Morozovsk: too deep in Soviet zone</pre>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    A cubed Cauchy kernel with an 8-degree cutoff makes certain geographic configurations unreachable. The Don bend is a deep potential well. No local perturbation can overcome the regional gradient. The memory file's advice&mdash;<em>don't waste time</em>&mdash;is itself knowledge. A model that is honest about its limits earns more trust than one that hides them.
+  </p>
 </article>
 
 <!-- ACT V — CQRS -->
@@ -361,32 +376,6 @@ Corridors Added:
   </div>
 </article>
 
-<!-- ACT IX — The Iteration Loop -->
-<article class="mb-20 max-w-3xl mx-auto">
-  <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act IX</p>
-    <h2 class="font-headline text-3xl font-bold">The Loop</h2>
-    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    With the comparison pipeline in place, the work became a tight feedback loop across February 15–17. Two separate contours now existed: one from the simulation (the event-driven density field from Part One) and one from the reference (the CV-extracted front line from the video). Overlaying them revealed exactly where and how the simulation diverged. When the simulation's contour was too far east in Ukraine, it meant missing German advances&mdash;fix by adding geometry overlays. When pockets didn't form around Kyiv, it meant needing encirclement corridor shapes.
-  </p>
-</article>
-
-<figure class="mb-8">
-  <img src="images/ww2-map/compare-iteration.png" alt="Iteration comparison" class="w-full rounded-lg shadow-lg">
-  <figcaption class="img-caption text-center">
-    Side-by-side during an iteration cycle. Left: old. Right: improved after adding event data and geometry overlays. Top: reference overlay. Bottom: density field classification.
-  </figcaption>
-</figure>
-
-<article class="mb-20 max-w-3xl mx-auto">
-  <p class="font-body text-lg leading-relaxed mb-5">
-    Enrichment agents added 89 new cities and 219 events with GPU-optimized strengths. Per-city kernel exponents were tuned so dense front-line areas resolved sharply. The Barbarossa directory grew to 96 files. 87 stale liberation events were fixed. And through it all, the rule held: never commit with failing field tests. The 899,941 sign checks were the safety net.
-  </p>
-</article>
-
 <!-- Verification grid -->
 <figure class="mb-8">
   <img src="images/ww2-map/verify-dec-1941.png" alt="Verification grid" class="w-full rounded-lg shadow-lg">
@@ -411,40 +400,6 @@ Corridors Added:
       Where they agree, the simulation is truthful.
     </p>
   </div>
-</article>
-
-<!-- ═══════════════════════════════════════════ -->
-<!-- CODA                                       -->
-<!-- ═══════════════════════════════════════════ -->
-
-<div class="max-w-3xl mx-auto mb-12 text-center border-t-2 border-black pt-12">
-  <span class="phase-label">Coda</span>
-</div>
-
-<article class="mb-20 max-w-3xl mx-auto">
-  <div class="text-center mb-8">
-    <h2 class="font-headline text-3xl font-bold">The Intractable Failures</h2>
-    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    Not every problem was solvable. The project's memory file contains a section titled "Intractable Failures (Don't Waste Time)":
-  </p>
-
-  <div class="code-block my-8">
-<pre>- Deep Don bend cities (Frolovo -23, Ilovlya -35):
-    massive Soviet rear influence
-- Volga east bank Soviet cities near Stalingrad:
-    overwhelmed by Axis field from opposite bank
-- Morozovsk: too deep in Soviet zone</pre>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5">
-    A cubed Cauchy kernel with an 8-degree cutoff makes certain geographic configurations unreachable. The Don bend is a deep potential well. No local perturbation can overcome the regional gradient. The memory file's advice&mdash;<em>don't waste time</em>&mdash;is itself knowledge. A model that is honest about its limits earns more trust than one that hides them.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    The simulation is thirty lines of math, and it will always be thirty lines of math. What grows is the data: 10,804 labeled events across 1,597 cities, 240 JSON files across 12 campaign directories, each one explaining what happened and why. The front line emerges from the arithmetic. The understanding is in the labels.
-  </p>
 </article>
 
 <!-- Closing -->
