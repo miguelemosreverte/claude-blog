@@ -264,10 +264,10 @@ tailwind.config = {
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    On February 14, a new problem surfaced. The density field produces smooth, rounded contours. But real front lines have sharp features&mdash;panzer breakthrough fingers, encirclement corridors, narrow salients. The cubed Cauchy kernel can't produce a thin finger from point sources alone.
+    On February 14, a new problem surfaced. We had the simulation from Part One, and now we had the reference timelapse. Comparing them revealed a structural mismatch: the density field produces smooth, rounded contours, but real front lines have sharp features&mdash;panzer breakthrough fingers, encirclement corridors, narrow salients. The cubed Cauchy kernel can't produce a thin finger from point sources alone.
   </p>
   <p class="font-body text-lg leading-relaxed mb-5">
-    The solution was <strong>geometry overlays</strong>: corridors, pockets, salients, and bridgeheads defined as shapes that override the field grid in post-processing. Four panzer group breakthrough corridors were added for Barbarossa. Soviet resistance salients created the wavy, irregular front line visible in the reference. The overlay system didn't change the kernel math at all&mdash;it masked the field <em>after</em> computation, creating zero-crossings that the marching-squares algorithm traced automatically.
+    The solution was <strong>geometry overlays</strong>: corridors, pockets, salients, and bridgeheads defined as GeoJSON shapes that mask the density field grid in post-processing. These are not events&mdash;they are geometric primitives (polygons, polylines) that directly override regions of the computed field. Four panzer group breakthrough corridors were added for Barbarossa. Soviet resistance salients created the wavy, irregular front line visible in the reference.
   </p>
 </article>
 
@@ -320,7 +320,7 @@ tailwind.config = {
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    Visual comparison was a start, but subjective. The next step was extracting the actual front-line geometry from the reference video frames&mdash;turning pixels into comparable geometry. This is computer vision applied to cartography. The pipeline works in stages:
+    Visual comparison was a start, but subjective. The next step was extracting the actual front-line geometry from the reference video frames&mdash;turning pixels into comparable coordinates. This has nothing to do with events or the density field. It is pure computer vision applied to cartography: color analysis on raster images. The pipeline works in stages:
   </p>
 </article>
 
@@ -341,7 +341,10 @@ tailwind.config = {
 
 <article class="mb-20 max-w-3xl mx-auto">
   <p class="font-body text-lg leading-relaxed mb-5">
-    The pipeline ran on all 60 frames of the reference timelapse, producing 60 comparison composites. Each showed precisely where the simulation agreed with the reference and where it diverged. Feedback was recorded per date:
+    Red-excess isolates Axis territory. A sigmoid normalizes the signal. A median filter kills noise. Island removal eliminates small disconnected regions. Erosion tightens boundaries. Finally, contour tracing extracts the front line as a polyline&mdash;geometry derived entirely from pixel colors, with no knowledge of events or cities.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The pipeline ran on all 60 frames of the reference timelapse, producing 60 extracted front lines and comparison composites. Each showed precisely where the simulation's contour diverged from the reference's contour. Feedback was recorded per date:
   </p>
 
   <div class="code-block my-8">
@@ -367,7 +370,7 @@ Corridors Added:
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    With the comparison pipeline in place, the work became a tight feedback loop across February 15–17: render, compare, identify divergences, add events or geometry, render again. Each cycle sharpened the match. When the front line was too far east in Ukraine, it meant missing German advances. When pockets didn't form around Kyiv, it meant needing encirclement corridors.
+    With the comparison pipeline in place, the work became a tight feedback loop across February 15–17. Two separate contours now existed: one from the simulation (the event-driven density field from Part One) and one from the reference (the CV-extracted front line from the video). Overlaying them revealed exactly where and how the simulation diverged. When the simulation's contour was too far east in Ukraine, it meant missing German advances&mdash;fix by adding geometry overlays. When pockets didn't form around Kyiv, it meant needing encirclement corridor shapes.
   </p>
 </article>
 
@@ -396,15 +399,16 @@ Corridors Added:
 <figure class="mb-16 mt-8">
   <img src="images/ww2-map/composite-oct-1941.png" alt="October 1941" class="w-full rounded-lg shadow-lg">
   <figcaption class="img-caption text-center">
-    October 5, 1941&mdash;peak Axis advance. The yellow contour closely tracks the reference boundary.
+    October 5, 1941&mdash;peak Axis advance. The simulation contour (yellow) closely tracks the reference contour (extracted from the video frame via CV).
   </figcaption>
 </figure>
 
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="pull-quote my-10 py-6 px-2">
     <p class="font-headline text-2xl italic text-center leading-snug">
-      The yellow contour is not drawn by hand.<br>
-      It emerges from the arithmetic of 10,804 events.
+      Two contours, two origins.<br>
+      One from 10,804 events. One from 60 video frames.<br>
+      Where they agree, the simulation is truthful.
     </p>
   </div>
 </article>
