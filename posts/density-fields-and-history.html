@@ -24,15 +24,12 @@ tailwind.config = {
 }
 </script>
 <style>
-  .drop-cap::first-letter {
-    float: left; font-family: 'Playfair Display', Georgia, serif;
-    font-size: 4.5rem; line-height: 0.8; padding-right: 0.5rem;
-    padding-top: 0.25rem; font-weight: 900; color: #111;
-  }
-  .pull-quote { border-top: 3px solid #0274B6; border-bottom: 1px solid #ccc; }
-  .act-number { font-size: 0.65rem; letter-spacing: 0.4em; }
-  .img-caption { font-family: 'Inter', sans-serif; font-size: 0.75rem; color: #666; margin-top: 0.5rem; }
-  .code-block { background: #F5F0E8; border: 1px solid #e0d8c8; border-radius: 0.375rem; padding: 1.25rem; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 0.8rem; overflow-x: auto; line-height: 1.6; }
+  .drop-cap::first-letter { float:left; font-family:'Playfair Display',Georgia,serif; font-size:4.5rem; line-height:0.8; padding-right:0.5rem; padding-top:0.25rem; font-weight:900; color:#111; }
+  .pull-quote { border-top:3px solid #0274B6; border-bottom:1px solid #ccc; }
+  .act-number { font-size:0.65rem; letter-spacing:0.4em; }
+  .img-caption { font-family:'Inter',sans-serif; font-size:0.75rem; color:#666; margin-top:0.5rem; }
+  .code-block { background:#F5F0E8; border:1px solid #e0d8c8; border-radius:0.375rem; padding:1.25rem; font-family:'SFMono-Regular',Consolas,monospace; font-size:0.8rem; overflow-x:auto; line-height:1.6; }
+  .phase-label { font-family:'Inter',sans-serif; font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:#0274B6; border:1px solid #0274B6; padding:2px 10px; border-radius:2px; display:inline-block; margin-bottom:0.75rem; }
 </style>
 </head>
 <body class="bg-wsj-bg text-wsj-ink">
@@ -49,7 +46,7 @@ tailwind.config = {
     <h1 class="font-headline text-4xl md:text-5xl font-black leading-tight tracking-tight">Density Fields and History</h1>
     <p class="font-headline text-xl md:text-2xl italic text-wsj-caption mt-3 leading-snug">
       How we modeled the Eastern Front as a physics problem<br class="hidden md:block">
-      and built an interactive simulation from 5,500 historical events
+      and built an interactive simulation from 10,000 historical events
     </p>
   </div>
 </header>
@@ -58,66 +55,58 @@ tailwind.config = {
 
 <!-- ═══════ HERO ═══════ -->
 <section class="mb-16 -mx-6">
-  <div class="bg-black rounded-lg overflow-hidden shadow-2xl" style="height: 500px;">
+  <div class="bg-black rounded-lg overflow-hidden shadow-2xl" style="height:500px;">
     <iframe src="../map/" width="100%" height="100%" style="border:none;" title="Eastern Front Map"></iframe>
   </div>
   <p class="img-caption text-center mt-3 px-6">
-    The simulation loops through 26 keyframe dates from June 1941 to May 1945. Use arrow keys to step through manually.
+    The simulation loops through 26 keyframe dates from June 1941 to May 1945. Arrow keys to step manually.
     <a href="../map/" class="text-wsj-accent hover:underline" target="_blank">Open fullscreen &rarr;</a>
   </p>
 </section>
 
-<!-- ═══════ ACT I — The Idea ═══════ -->
+<!-- ═══════════════════════════════════════════ -->
+<!-- PART ONE: THE SIMULATION                   -->
+<!-- Feb 6–10: events, field tests, optimizer   -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="max-w-3xl mx-auto mb-12 text-center">
+  <span class="phase-label">Part One &middot; Feb 6–10</span>
+  <h2 class="font-headline text-2xl font-bold mt-2">Building the Simulation</h2>
+</div>
+
+<!-- ACT I — The Equation -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
     <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act I</p>
-    <h2 class="font-headline text-3xl font-bold">The Idea</h2>
+    <h2 class="font-headline text-3xl font-bold">The Equation</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    The Eastern Front of World War II stretched from the Arctic to the Black Sea. Over four years, the front line shifted across thousands of kilometers as armies of millions advanced, retreated, encircled, and were encircled. Miguel wanted to build an interactive map that showed this movement&mdash;not as a static image, but as a living simulation you could step through in time.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    The conventional approach would be to draw front lines by hand for each date. But that doesn't scale, and more importantly, doesn't <em>explain</em> anything. The choice was to model territorial control as a continuous scalar field&mdash;like a physics simulation. Every city is a point source. Axis cities push the field positive. Soviet cities push it negative. The front line is the zero-crossing contour: the boundary where the field changes sign. One equation:
+    The Eastern Front of World War II stretched from the Arctic to the Black Sea. Miguel wanted to build an interactive map that showed the front line's movement&mdash;not as hand-drawn frames, but as a physics simulation. Every city is a point source in a continuous scalar field. Axis cities push positive, Soviet cities push negative. The front line is the zero crossing:
   </p>
 
   <div class="bg-white border border-gray-300 p-6 my-8 text-center rounded">
     <p class="font-body italic text-xl">field(lat, lon) = &Sigma; (sign &times; w) / (1 + dist&sup2;)&sup3;</p>
-    <p class="font-sans text-xs text-wsj-caption mt-3">Cubed Cauchy kernel. That's the whole simulation.</p>
+    <p class="font-sans text-xs text-wsj-caption mt-3">Cubed Cauchy kernel. No special cases. Pockets, salients, encirclements&mdash;all emerge from this one line.</p>
   </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5">
-    No special cases for encirclements, pockets, or salients. No pathfinding. No rule engine. Just arithmetic on labeled data points. Pockets <em>emerge</em> naturally as isolated positive regions in a negative sea. The front line <em>emerges</em> as the zero contour. All complexity lives in the data, not the algorithm.
-  </p>
 </article>
 
-<!-- Reference still -->
-<figure class="mb-16">
-  <img src="images/ww2-map/reference-still.jpg" alt="Reference timelapse frame" class="w-full rounded-lg shadow-lg">
-  <figcaption class="img-caption text-center">
-    The reference timelapse that started the project&mdash;a cartographic rendering showing Axis (red) and Soviet (beige) territorial control. The simulation's job is to reproduce these boundaries from raw event data.
-  </figcaption>
-</figure>
-
-<!-- ═══════ ACT II — The Event ═══════ -->
+<!-- ACT II — The First Events -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
     <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act II</p>
-    <h2 class="font-headline text-3xl font-bold">The Event</h2>
+    <h2 class="font-headline text-3xl font-bold">The First Events</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    With the math decided, the first task was defining how to feed it data. The answer was the <strong>event</strong>&mdash;a small, atomic record that says what happened, where, when, and why. Every event is a tuple of four elements: a date, a city, a control state, and a bag of labels.
-  </p>
-
-  <p class="font-body text-lg leading-relaxed mb-5">
-    Here is the first event ever written for the project&mdash;the opening of Barbarossa:
+    On February 6, the first commit landed: the initial dataset, the density field math, and the renderer. The data is event-sourced&mdash;every change to the map is an atomic record: a date, a city, a control state, and a bag of labels. The state at any date is computed by replaying all events up to that point.
   </p>
 
   <div class="code-block my-8">
-<pre>["1941-06-22", "konigsberg", "axis", {
+<pre><span style="color:#888">// The first event: Barbarossa, June 22, 1941</span>
+["1941-06-22", "konigsberg", "axis", {
   "operation": "barbarossa",
   "note": "East Prussian staging area for AG Centre and North",
   "unit_army_group": "ag_centre",
@@ -128,155 +117,53 @@ tailwind.config = {
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5">
-    The system is event-sourced: the state at any date is computed by replaying all events up to that point. There is no mutable state, no database to migrate. The canonical history is a stream of immutable facts, and the current control of every city is a pure function of that stream.
+    Labels serve two purposes. <strong>Penalty labels</strong>&mdash;<code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">supply_disruption</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">attrition</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">air_superiority</code>&mdash;reduce a city's weight. They compound: <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">supply_disruption: 0.5</code> and <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">attrition: 0.3</code> gives 35% effective weight. <strong>Metadata labels</strong>&mdash;operations, commanders, notes&mdash;make the dataset self-documenting without touching the math.
   </p>
   <p class="font-body text-lg leading-relaxed mb-5">
-    The labels serve two purposes. Some are <strong>penalty labels</strong> that reduce a city's effective weight in the density field&mdash;<code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">supply_disruption</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">attrition</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">air_superiority</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">frostbite_casualties</code>. They compound multiplicatively: <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">supply_disruption: 0.5</code> and <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">attrition: 0.3</code> reduces weight to 35%. The rest are <strong>metadata</strong>&mdash;operation names, unit designations, commanders, notes&mdash;that make the dataset self-documenting without affecting the math.
+    Within hours on that first day, the dataset was enriched with unit-level tracking: divisions, corps, army groups, commanders. By evening, 99.8% of events had structured labels. The data was already more than a simulation input&mdash;it was becoming a labeled historical dataset.
   </p>
 </article>
 
-<!-- ═══════ ACT III — First Front Line ═══════ -->
+<!-- ACT III — Campaigns -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
     <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act III</p>
-    <h2 class="font-headline text-3xl font-bold">The First Front Line</h2>
+    <h2 class="font-headline text-3xl font-bold">Campaigns and Agents</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    The first milestone was producing a front line that roughly matched reality for June 22, 1941. This required defining hundreds of cities along the pre-war border with their initial control states, then adding the events of the first days: the rapid German advance through the Baltics, the encirclement at Bialystok-Minsk, the drive toward Smolensk.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    The test was simple and brutal. For every event in the dataset, check: does the density field sign at that location match the declared control state? If an event says Orel is Axis-controlled, the field at Orel must be positive. A test failure looks like this:
-  </p>
-
-  <div class="code-block my-8">
-<pre>&#x2717; 1941-10-03  Orel      label=axis (+)  field=-5.02</pre>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5">
-    The field is &minus;5.02 (Soviet) where it should be positive (Axis). The event is correct&mdash;Guderian's 2nd Panzer Group did capture Orel on October 3. But the field hasn't flipped because there aren't enough nearby Axis cities yet. The fix is never to change the math. It's always to add more events&mdash;more cities that changed hands in that campaign, so the cumulative field shifts.
-  </p>
-</article>
-
-<!-- June 1941 composite -->
-<figure class="mb-8">
-  <img src="images/ww2-map/composite-jun-1941.png" alt="June 1941 composite" class="w-full rounded-lg shadow-lg">
-  <figcaption class="img-caption text-center">
-    June 22, 1941&mdash;three-panel validation. Left: reference timelapse frame. Center: simulation with front line overlay. Right: density field classification (green = Axis, blue = Soviet).
-  </figcaption>
-</figure>
-
-<!-- Overlay progression -->
-<div class="grid md:grid-cols-3 gap-4 mb-16 mt-8">
-  <figure>
-    <img src="images/ww2-map/overlay-july-1941.png" alt="July 1941" class="w-full rounded shadow">
-    <figcaption class="img-caption text-center">July 1941 &mdash; Barbarossa drives east through the Baltics and toward Smolensk.</figcaption>
-  </figure>
-  <figure>
-    <img src="images/ww2-map/overlay-sep-1941.png" alt="September 1941" class="w-full rounded shadow">
-    <figcaption class="img-caption text-center">September 1941 &mdash; Kiev falls. Leningrad besieged. The front reaches Moscow.</figcaption>
-  </figure>
-  <figure>
-    <img src="images/ww2-map/overlay-dec-1941.png" alt="December 1941" class="w-full rounded shadow">
-    <figcaption class="img-caption text-center">December 1941 &mdash; Deepest advance. Winter counteroffensives halt the push.</figcaption>
-  </figure>
-</div>
-
-<article class="mb-20 max-w-3xl mx-auto">
-  <div class="pull-quote my-10 py-6 px-2">
-    <p class="font-headline text-2xl italic text-center leading-snug">
-      The yellow contour is not drawn by hand.<br>
-      It emerges from the arithmetic of 5,500 events.
-    </p>
-  </div>
-</article>
-
-<!-- ═══════ ACT IV — Campaigns ═══════ -->
-<article class="mb-20 max-w-3xl mx-auto">
-  <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act IV</p>
-    <h2 class="font-headline text-3xl font-bold">Campaigns and Collaboration</h2>
-    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    As the dataset grew, a single file couldn't hold it. The events were partitioned across campaign directories&mdash;each one a self-contained collection of numbered JSON files, each with a metadata block recording who wrote it, when, and what it covers:
+    The events were partitioned across campaign directories, each maintained by a dedicated Claude agent. Multiple agents could work simultaneously without conflicts because events were partitioned by directory and the merge tool combined files alphabetically:
   </p>
 
   <div class="code-block my-8">
 <pre>src/data/events/
-  000-base.json              &larr; core cities, initial borders
-  barbarossa/                &larr; 96 files
-    001-pockets.json
-    004-june-opening.json
-    005-july-advances.json
-    ...
-  uranus/                    &larr; 38 files
-    001-encirclement.json
-    010-pocket-and-kharkov-fix.json
-    022-uranus-encirclement-detail.json
-    029-optimizer-batch1.json
-    038-backfill-force-composition.json
-  kursk/                     &larr; 24 files
-  case-blue/                 &larr; 19 files
-  bagration/                 &larr; 15 files
-  dnieper-offensive/         &larr; 22 files
-  berlin/                    &larr; 14 files
-  vistula/                   &larr;  8 files
-  air-war/                   &larr;  1 file
-  weather/                   &larr;  1 file
-  logistics/                 &larr;  1 file</pre>
+  000-base.json            &larr; core cities
+  barbarossa/  96 files    &larr; Jun–Dec 1941
+  case-blue/   19 files    &larr; May–Nov 1942
+  uranus/      38 files    &larr; Nov 1942 – Feb 1943
+  kursk/       24 files    &larr; Jul–Aug 1943
+  dnieper/     22 files    &larr; Aug–Dec 1943
+  bagration/   15 files    &larr; Jun–Aug 1944
+  berlin/      14 files    &larr; Apr–May 1945
+  vistula/      8 files    &larr; Jan–Mar 1945
+  air-war/      1 file     &larr; Luftwaffe penalties
+  weather/      1 file     &larr; Seasonal modifiers
+  logistics/    1 file     &larr; Supply line effects</pre>
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5">
-    A merge tool globs all 240 JSON files, deduplicates cities, concatenates events, sorts them by date, and produces a single 6 MB document: <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">eastern-front.json</code>. Files are processed alphabetically, so <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">uranus/</code> always overrides <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">case-blue/</code> for same-date events. This determinism is what made multi-agent collaboration possible.
+    Each file carries a metadata block recording the author and reasoning. The numbered filenames tell the story of iterative refinement&mdash;the Uranus directory grew from a single <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">001-encirclement.json</code> to 38 files as the Stalingrad pocket events were refined.
   </p>
   <p class="font-body text-lg leading-relaxed mb-5">
-    Multiple Claude agents worked in parallel, each assigned a campaign directory. A Barbarossa agent researched the opening weeks. A Uranus agent handled the Stalingrad encirclement. A Kursk agent covered the summer of 1943. They could work simultaneously without conflicts because events were partitioned by directory. The numbered filenames within each directory tell the story of iterative refinement&mdash;the Uranus directory grew from a single <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">001-encirclement.json</code> to 38 files as the pocket events were refined through dozens of cycles.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    Each file's metadata block records the agent's reasoning&mdash;an audit trail:
+    A <strong>resource conservation principle</strong> prevented the most dangerous failure mode of multi-agent data entry: inflation. Inspired by physics simulations that conserve mass and by Rust's ownership model, every resource had to be traceable to an explicit event. Compare early events with later ones&mdash;the evolution is visible:
   </p>
 
   <div class="code-block my-8">
-<pre>{
-  "meta": {
-    "id": "uranus-pocket-kharkov-fix",
-    "title": "Stalingrad Pocket Strengthening",
-    "author": "uranus-conservation-agent",
-    "created": "2026-02-06",
-    "description": "Pocket strength adjustments. Resource
-      conservation applied: pocket events use decomposed
-      supply modifiers."
-  }
-}</pre>
-  </div>
-</article>
+<pre><span style="color:#888">// Early (Feb 6): magic number</span>
+["1941-10-03", "orel", "axis", {"strength": 5}]
 
-<!-- ═══════ ACT V — Resource Conservation ═══════ -->
-<article class="mb-20 max-w-3xl mx-auto">
-  <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act V</p>
-    <h2 class="font-headline text-3xl font-bold">Resource Conservation</h2>
-    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    The most dangerous failure mode of collaborative data entry is inflation. Agent A sets <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">strength: 12</code> in their region, Agent B sets <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">strength: 15</code> in theirs, and the total forces exceed what historically existed. The numbers are magic&mdash;untraceable, unjustified, unaccountable.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    The solution was a <strong>resource conservation principle</strong>, inspired by particle physics simulations that conserve mass. Every resource that affects the density field&mdash;soldiers, ammunition, food, fuel&mdash;is finite and must be traceable to an explicit event. Resources are owned in a hierarchy modeled after Rust's ownership system: Front &rarr; Army Group &rarr; Army &rarr; Corps &rarr; City. Only one event can modify a resource at a given level at a time&mdash;exclusive mutable access.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    Compare early events with later ones. The evolution is visible:
-  </p>
-
-  <div class="code-block my-8">
-<pre><span style="color:#888">// Early: magic numbers, no accountability</span>
-["1941-10-03", "orel", "axis", {"strength": 5, "operation": "typhoon"}]
-
-<span style="color:#888">// Later: decomposed supply, traceable forces</span>
+<span style="color:#888">// Later (Feb 10): decomposed, traceable</span>
 ["1942-11-23", "stalingrad", "soviet", {
   "operation": "uranus",
   "strength": 5,
@@ -285,27 +172,155 @@ tailwind.config = {
   "fuel_supply": 0.15,
   "unit_army": "6th_army",
   "commander": "manstein",
-  "note": "Pocket formed: ~290,000 troops in ~1,500 km2.
-    Ammo for ~2 weeks defensive combat, food 6-day
-    reserve, fuel critically low."
+  "note": "Pocket: ~290,000 troops. Ammo for 2 weeks,
+    food 6-day reserve, fuel critically low."
 }]</pre>
   </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5">
-    The generic <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">supply_disruption</code> label was decomposed into specific resources: <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">ammunition_supply</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">food_supply</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">fuel_supply</code>. Each one grounded in historical records. The 6th Army pocket at Stalingrad had precisely these supply dynamics: ammunition for two weeks, six days of food, nearly no fuel. The labels encode real logistics, not guesses.
-  </p>
 </article>
 
-<!-- ═══════ ACT VI — Extraction Pipeline ═══════ -->
+<!-- ACT IV — Field Tests and the Optimizer -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VI</p>
-    <h2 class="font-headline text-3xl font-bold">The Extraction Pipeline</h2>
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act IV</p>
+    <h2 class="font-headline text-3xl font-bold">16,975 Failures</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    Iterating by eye wasn't good enough. To validate the simulation systematically against the reference timelapse, we built a front-line extraction pipeline&mdash;computer vision applied to cartography. Take a frame from the reference video, extract the front line, compare it to the simulation's computed contour.
+    The test is one concept: for every event in the dataset, does the field sign match the declared control? If an event says Orel is Axis, the field at Orel must be positive. A failure looks like:
+  </p>
+
+  <div class="code-block my-8">
+<pre>&#x2717; 1941-10-03  Orel      label=axis (+)  field=-5.02</pre>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    By February 9, as the dataset grew, so did the failures. With 10,000+ events across 1,597 cities and 1,067 dates, there were 16,975 sign mismatches. The fix is never to change the math&mdash;it's always to add more events or tune strengths so the cumulative field shifts.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    Manual fixes brought it down by hundreds at a time&mdash;122, then 319, then 317. But the pace was too slow. On February 10, a Rust optimizer with GPU acceleration was built. It searched for optimal city strengths to minimize failures across the entire timeline. The first run cut 2,264 failures (16,975 &rarr; 14,711). A second batch cut 898 more. By February 14, the engine was replaced with adaptive resolution&mdash;per-city kernel exponents that let dense front-line areas resolve correctly without disturbing the smooth visual rendering elsewhere.
+  </p>
+</article>
+
+<!-- ACT V — CQRS -->
+<article class="mb-20 max-w-3xl mx-auto">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act V</p>
+    <h2 class="font-headline text-3xl font-bold">The Read Side</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    On February 7, the CQRS architecture arrived. Computing the density field across a grid for 1,067 dates is expensive in JavaScript. The solution: a Rust binary that pre-computes everything and writes it to a SQLite database.
+  </p>
+
+  <div class="code-block my-8">
+<pre>240 event files  &rarr;  merge  &rarr;  eastern-front.json (6 MB)
+                              &darr;
+                     Rust readside-builder (GPU: Metal)
+                              &darr;
+                     eastern-front.db (SQLite, 141 MB)
+                       &bull; field grids at 2 resolutions
+                       &bull; marching-squares contours
+                       &bull; city states per date
+                       &bull; 1,067 dates in 5 seconds</pre>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The UI loads pre-computed tiles from SQLite&mdash;zero field computation at render time. The static version on this blog goes further still: Puppeteer captures screenshots of the real UI at each keyframe, so the blog serves pre-rendered PNGs with zero JavaScript.
+  </p>
+
+  <div class="pull-quote my-10 py-6 px-2">
+    <p class="font-headline text-2xl italic text-center leading-snug">
+      The simulation is arithmetic.<br>The understanding is in the labels.
+    </p>
+  </div>
+</article>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- PART TWO: THE REFERENCE COMPARISON             -->
+<!-- Feb 14–17: geometry overlays, video extraction -->
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="max-w-3xl mx-auto mb-12 text-center border-t-2 border-black pt-12">
+  <span class="phase-label">Part Two &middot; Feb 14–17</span>
+  <h2 class="font-headline text-2xl font-bold mt-2">Seeing the Truth</h2>
+</div>
+
+<!-- Reference still -->
+<figure class="mb-16">
+  <img src="images/ww2-map/reference-still.jpg" alt="Reference timelapse frame" class="w-full rounded-lg shadow-lg">
+  <figcaption class="img-caption text-center">
+    The reference: a timelapse of the Eastern Front from a historical cartography video, showing Axis (red) and Soviet (beige) territory. Until now, we had no way to compare our simulation against it systematically.
+  </figcaption>
+</figure>
+
+<!-- ACT VI — Geometry Overlays -->
+<article class="mb-20 max-w-3xl mx-auto">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VI</p>
+    <h2 class="font-headline text-3xl font-bold">Geometry Overlays</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    On February 14, a new problem surfaced. The density field produces smooth, rounded contours. But real front lines have sharp features&mdash;panzer breakthrough fingers, encirclement corridors, narrow salients. The cubed Cauchy kernel can't produce a thin finger from point sources alone.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The solution was <strong>geometry overlays</strong>: corridors, pockets, salients, and bridgeheads defined as shapes that override the field grid in post-processing. Four panzer group breakthrough corridors were added for Barbarossa. Soviet resistance salients created the wavy, irregular front line visible in the reference. The overlay system didn't change the kernel math at all&mdash;it masked the field <em>after</em> computation, creating zero-crossings that the marching-squares algorithm traced automatically.
+  </p>
+</article>
+
+<!-- ACT VII — The Comparison Pipeline -->
+<article class="mb-20 max-w-3xl mx-auto">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VII</p>
+    <h2 class="font-headline text-3xl font-bold">The Comparison Pipeline</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    Also on February 14, the first tools for comparing the simulation against the reference timelapse were built. This required solving a non-trivial alignment problem: the reference video uses a different map projection, different extent, different resolution. An 8-point geographic calibration with affine transforms aligned the two coordinate systems.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    By February 15, a live-compute comparison mode was working. The rendering pipeline could produce side-by-side composites: our field grid next to the reference frame, with the simulation's front line (yellow contour) overlaid on both. For the first time, we could see exactly where the simulation agreed with history and where it diverged.
+  </p>
+</article>
+
+<!-- June 1941 composite -->
+<figure class="mb-8">
+  <img src="images/ww2-map/composite-jun-1941.png" alt="June 1941 composite" class="w-full rounded-lg shadow-lg">
+  <figcaption class="img-caption text-center">
+    June 22, 1941&mdash;three-panel validation. Left: reference timelapse frame. Center: simulation with front line overlay. Right: density field classification.
+  </figcaption>
+</figure>
+
+<!-- Overlays -->
+<div class="grid md:grid-cols-3 gap-4 mb-16 mt-8">
+  <figure>
+    <img src="images/ww2-map/overlay-july-1941.png" alt="July 1941" class="w-full rounded shadow">
+    <figcaption class="img-caption text-center">July 1941 &mdash; Barbarossa drives east. The yellow contour tracks the reference.</figcaption>
+  </figure>
+  <figure>
+    <img src="images/ww2-map/overlay-sep-1941.png" alt="September 1941" class="w-full rounded shadow">
+    <figcaption class="img-caption text-center">September 1941 &mdash; Kiev falls. Leningrad besieged.</figcaption>
+  </figure>
+  <figure>
+    <img src="images/ww2-map/overlay-dec-1941.png" alt="December 1941" class="w-full rounded shadow">
+    <figcaption class="img-caption text-center">December 1941 &mdash; Deepest advance. Winter halts the push.</figcaption>
+  </figure>
+</div>
+
+<!-- ACT VIII — Front-Line Extraction -->
+<article class="mb-20 max-w-3xl mx-auto">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VIII</p>
+    <h2 class="font-headline text-3xl font-bold">Extracting the Front Line</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    Visual comparison was a start, but subjective. The next step was extracting the actual front-line geometry from the reference video frames&mdash;turning pixels into comparable geometry. This is computer vision applied to cartography. The pipeline works in stages:
   </p>
 </article>
 
@@ -316,148 +331,94 @@ tailwind.config = {
   </figure>
   <figure>
     <img src="images/ww2-map/pipeline-1-extraction.png" alt="Pipeline: extraction" class="w-full rounded shadow">
-    <figcaption class="img-caption text-center">Stage 1: Red-excess field. Color analysis separates Axis (red) from Soviet (blue).</figcaption>
+    <figcaption class="img-caption text-center">Stage 1: Red-excess field separates Axis (red) from Soviet (blue).</figcaption>
   </figure>
   <figure>
     <img src="images/ww2-map/pipeline-2-classified.png" alt="Pipeline: classified" class="w-full rounded shadow">
-    <figcaption class="img-caption text-center">Stage 6: Final classification after sigmoid, median filter, island removal, erosion.</figcaption>
+    <figcaption class="img-caption text-center">Stage 6: Classified after sigmoid, median filter, island removal, erosion.</figcaption>
   </figure>
 </div>
 
 <article class="mb-20 max-w-3xl mx-auto">
   <p class="font-body text-lg leading-relaxed mb-5">
-    The pipeline ran on all 60 frames of the reference timelapse, producing 60 comparison composites. Each showed where the simulation agreed with the reference and where it diverged&mdash;a precise map of what needed more event data.
-  </p>
-</article>
-
-<!-- ═══════ ACT VII — Iteration ═══════ -->
-<article class="mb-20 max-w-3xl mx-auto">
-  <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VII</p>
-    <h2 class="font-headline text-3xl font-bold">The Iteration Loop</h2>
-    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    The comparison pipeline enabled a tight feedback loop: run the simulation, compare against reference, identify divergences, research the history, add events, repeat. Each cycle had a feedback file recording what improved and what remained:
+    The pipeline ran on all 60 frames of the reference timelapse, producing 60 comparison composites. Each showed precisely where the simulation agreed with the reference and where it diverged. Feedback was recorded per date:
   </p>
 
   <div class="code-block my-8">
 <pre><span style="color:#888"># reference/comparison/1941/07/04/feedback.md</span>
 
-# Feedback: 1941-07-04 — Barbarossa Day 12
-
 Status: Significantly Improved
   (panzer breakthrough fingers now visible)
 
 Corridors Added:
-  1. Hoth's 3rd Panzer Group (AG Center North Pincer)
-     Route: Suwalki &rarr; Vilnius &rarr; Molodechno &rarr; Borisov
-  2. Guderian's 2nd Panzer Group (AG Center South Pincer)
-     Route: Brest &rarr; Baranovichi &rarr; Slutsk &rarr; Bobruisk</pre>
+  1. Hoth's 3rd Panzer Group (AG Center North)
+     Route: Suwalki &rarr; Vilnius &rarr; Borisov &rarr; Vitebsk
+  2. Guderian's 2nd Panzer Group (AG Center South)
+     Route: Brest &rarr; Baranovichi &rarr; Bobruisk</pre>
   </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5">
-    When the front line was too far east in Ukraine, it meant missing the rapid German advance through that sector. When pockets didn't form around Kyiv, it meant needing encirclement events with supply disruption labels. The Barbarossa directory grew to 96 files through this process&mdash;each one a correction, a refinement, a new batch of cities and events.
-  </p>
 </article>
 
-<!-- Compare iteration -->
-<figure class="mb-16">
-  <img src="images/ww2-map/compare-iteration.png" alt="Iteration comparison" class="w-full rounded-lg shadow-lg">
-  <figcaption class="img-caption text-center">
-    Side-by-side comparison during an iteration cycle. Left: old version. Right: improved version after adding event data. Top row: reference overlay. Bottom: density field classification.
-  </figcaption>
-</figure>
-
-<!-- ═══════ ACT VIII — CQRS ═══════ -->
-<article class="mb-20 max-w-3xl mx-auto">
-  <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VIII</p>
-    <h2 class="font-headline text-3xl font-bold">The Read Side</h2>
-    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    The event files are the write side. But computing the density field across a 480&times;270 grid for 1,067 dates&mdash;evaluating the Cauchy kernel for each of 1,597 cities at each grid point&mdash;is expensive. The JavaScript reference implementation took minutes. So we built the read side: a Rust binary that pre-computes everything and writes it to a SQLite database.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    This is a textbook CQRS (Command Query Responsibility Segregation) architecture:
-  </p>
-
-  <div class="code-block my-8">
-<pre>src/data/events/**/*.json     &larr; write side (human-authored)
-        &darr;
-  merge-data.cjs              &larr; 240 files &rarr; 1 JSON (6 MB)
-        &darr;
-  readside-builder (Rust)     &larr; GPU: Metal on M4 Pro
-        &darr;
-  eastern-front.db (SQLite)   &larr; read side (141 MB)
-    &bull; field grids (L0: 0.5&deg;, L1: 0.2&deg;)
-    &bull; marching-squares contours
-    &bull; city states per date
-    &bull; 1,067 dates &times; 2 resolution levels</pre>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5">
-    The GPU computes all 1,067 dates in five seconds. The UI loads pre-computed tiles from SQLite&mdash;zero field computation at render time. The static version on this blog goes one step further: Puppeteer captures screenshots of the real UI at each keyframe date, so the blog serves pre-rendered PNGs with zero JavaScript computation.
-  </p>
-</article>
-
-<!-- ═══════ ACT IX — Verification ═══════ -->
+<!-- ACT IX — The Iteration Loop -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
     <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act IX</p>
-    <h2 class="font-headline text-3xl font-bold">The Verification Grid</h2>
+    <h2 class="font-headline text-3xl font-bold">The Loop</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    Beyond visual comparison, the simulation includes a quantitative validation system. For every event in the dataset&mdash;approximately one million city&times;date combinations&mdash;the test checks whether the density field sign matches the declared control state. The verification view strips away all cartographic styling to show the raw contour line on a geographic grid:
+    With the comparison pipeline in place, the work became a tight feedback loop across February 15–17: render, compare, identify divergences, add events or geometry, render again. Each cycle sharpened the match. When the front line was too far east in Ukraine, it meant missing German advances. When pockets didn't form around Kyiv, it meant needing encirclement corridors.
   </p>
 </article>
 
 <figure class="mb-8">
+  <img src="images/ww2-map/compare-iteration.png" alt="Iteration comparison" class="w-full rounded-lg shadow-lg">
+  <figcaption class="img-caption text-center">
+    Side-by-side during an iteration cycle. Left: old. Right: improved after adding event data and geometry overlays. Top: reference overlay. Bottom: density field classification.
+  </figcaption>
+</figure>
+
+<article class="mb-20 max-w-3xl mx-auto">
+  <p class="font-body text-lg leading-relaxed mb-5">
+    Enrichment agents added 89 new cities and 219 events with GPU-optimized strengths. Per-city kernel exponents were tuned so dense front-line areas resolved sharply. The Barbarossa directory grew to 96 files. 87 stale liberation events were fixed. And through it all, the rule held: never commit with failing field tests. The 899,941 sign checks were the safety net.
+  </p>
+</article>
+
+<!-- Verification grid -->
+<figure class="mb-8">
   <img src="images/ww2-map/verify-dec-1941.png" alt="Verification grid" class="w-full rounded-lg shadow-lg">
   <figcaption class="img-caption text-center">
-    December 18, 1941. The yellow contour is the computed front line. Red dots are calibration cities. Pink regions indicate pockets or contested areas. No styling&mdash;just the raw math.
+    December 18, 1941. The verification view: no styling, just the raw contour on a geographic grid. Red dots are calibration cities. Pink regions are pockets.
   </figcaption>
 </figure>
 
-<!-- Oct 1941 composite -->
+<!-- Oct composite -->
 <figure class="mb-16 mt-8">
-  <img src="images/ww2-map/composite-oct-1941.png" alt="October 1941 composite" class="w-full rounded-lg shadow-lg">
+  <img src="images/ww2-map/composite-oct-1941.png" alt="October 1941" class="w-full rounded-lg shadow-lg">
   <figcaption class="img-caption text-center">
-    October 5, 1941&mdash;peak of the Axis advance. The simulation's front line (yellow) closely tracks the reference timelapse boundary.
+    October 5, 1941&mdash;peak Axis advance. The yellow contour closely tracks the reference boundary.
   </figcaption>
 </figure>
 
-<!-- ═══════ ACT X — What Emerged ═══════ -->
 <article class="mb-20 max-w-3xl mx-auto">
-  <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act X</p>
-    <h2 class="font-headline text-3xl font-bold">What Emerged</h2>
-    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
-  </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    The project today contains 10,804 events across 1,597 cities, organized in 240 JSON files across 12 campaign directories. The simulation produces front lines that visually match the reference timelapse from Barbarossa to Berlin, with 26 keyframe dates spanning the full war.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    But the most interesting thing is not what the project produces&mdash;it's what it <em>is</em>. A labeled dataset where every data point explains its own causality. When you look at the event for the 16th Panzer Division crossing the Don at Vertyachy, you see the corps, the division, the commander, the troop count, and a note explaining that they drove 60km to the Volga in a single day. When you look at the Stalingrad pocket, you see ammunition for two weeks, food for six days, and nearly no fuel. The simulation is arithmetic. The understanding is in the labels.
-  </p>
-
   <div class="pull-quote my-10 py-6 px-2">
     <p class="font-headline text-2xl italic text-center leading-snug">
-      The simulation is arithmetic.<br>The understanding is in the labels.
+      The yellow contour is not drawn by hand.<br>
+      It emerges from the arithmetic of 10,804 events.
     </p>
   </div>
 </article>
 
-<!-- ═══════ CODA ═══════ -->
+<!-- ═══════════════════════════════════════════ -->
+<!-- CODA                                       -->
+<!-- ═══════════════════════════════════════════ -->
+
+<div class="max-w-3xl mx-auto mb-12 text-center border-t-2 border-black pt-12">
+  <span class="phase-label">Coda</span>
+</div>
+
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Coda</p>
     <h2 class="font-headline text-3xl font-bold">The Intractable Failures</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
@@ -467,8 +428,7 @@ Corridors Added:
   </p>
 
   <div class="code-block my-8">
-<pre><span style="color:#888">## Intractable Failures (Don't Waste Time)</span>
-- Deep Don bend cities (Frolovo -23, Ilovlya -35):
+<pre>- Deep Don bend cities (Frolovo -23, Ilovlya -35):
     massive Soviet rear influence
 - Volga east bank Soviet cities near Stalingrad:
     overwhelmed by Axis field from opposite bank
@@ -476,13 +436,10 @@ Corridors Added:
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5">
-    These failures reveal the limits of the model. A cubed Cauchy kernel with an 8-degree cutoff makes certain geographic configurations unreachable. The Don bend is, in density-field terms, a deep potential well. No local perturbation can overcome the regional gradient.
+    A cubed Cauchy kernel with an 8-degree cutoff makes certain geographic configurations unreachable. The Don bend is a deep potential well. No local perturbation can overcome the regional gradient. The memory file's advice&mdash;<em>don't waste time</em>&mdash;is itself knowledge. A model that is honest about its limits earns more trust than one that hides them.
   </p>
   <p class="font-body text-lg leading-relaxed mb-5">
-    The memory file's advice&mdash;<em>don't waste time</em>&mdash;is itself knowledge. Knowing what you can't do is as valuable as knowing what you can. A model that is honest about its limits earns more trust than one that hides them.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    The simulation is thirty lines of math, and it will always be thirty lines of math. What grows is the data&mdash;the labeled events that explain, one city at a time, what happened on the Eastern Front.
+    The simulation is thirty lines of math, and it will always be thirty lines of math. What grows is the data: 10,804 labeled events across 1,597 cities, 240 JSON files across 12 campaign directories, each one explaining what happened and why. The front line emerges from the arithmetic. The understanding is in the labels.
   </p>
 </article>
 
@@ -491,7 +448,6 @@ Corridors Added:
   <a href="from-clone-to-commit.html" class="font-sans text-sm text-wsj-accent hover:underline">&larr; From Clone to Commit</a>
   <a href="../index.html" class="font-sans text-sm text-wsj-accent hover:underline">All posts &rarr;</a>
 </div>
-
 <div class="max-w-3xl mx-auto border-t-2 border-black pt-8 pb-12 text-center mt-4">
   <p class="font-sans text-xs text-wsj-caption tracking-widest uppercase">
     <a href="https://github.com/miguelemosreverte/ww2-map" class="hover:text-wsj-accent">Source &rarr; github.com/miguelemosreverte/ww2-map</a>
