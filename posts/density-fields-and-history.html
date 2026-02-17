@@ -90,6 +90,11 @@ tailwind.config = {
     <p class="font-body italic text-xl">field(lat, lon) = &Sigma; (sign &times; w) / (1 + dist&sup2;)&sup3;</p>
     <p class="font-sans text-xs text-wsj-caption mt-3">Cubed Cauchy kernel. No special cases. Pockets, salients, encirclements&mdash;all emerge from this one line.</p>
   </div>
+
+  <figure class="my-10">
+    <img src="images/ww2-map/app-barbarossa.png" alt="The simulation app at June 1941" class="w-full rounded-lg shadow-lg">
+    <figcaption class="img-caption text-center">The simulation at June 1941. Red glow: Axis-controlled territory. The yellow contour is the zero crossing of the density field&mdash;the front line.</figcaption>
+  </figure>
 </article>
 
 <!-- ACT II — The First Events -->
@@ -284,6 +289,11 @@ tailwind.config = {
   <p class="font-body text-lg leading-relaxed mb-5">
     The solution was <strong>geometry overlays</strong>: corridors, pockets, salients, and bridgeheads defined as GeoJSON shapes that mask the density field grid in post-processing. These are not events&mdash;they are geometric primitives (polygons, polylines) that directly override regions of the computed field. Four panzer group breakthrough corridors were added for Barbarossa. Soviet resistance salients created the wavy, irregular front line visible in the reference.
   </p>
+
+  <figure class="my-10">
+    <img src="images/ww2-map/overlay-crop-jun-1941.png" alt="Geometry overlays on the reference" class="w-full rounded-lg shadow-lg">
+    <figcaption class="img-caption text-center">Geometry overlays visualized on the reference frame. Magenta and cyan shapes are corridor and salient polygons that override the density field grid. The yellow contour is the resulting front line.</figcaption>
+  </figure>
 </article>
 
 <!-- ACT VII — The Comparison Pipeline -->
@@ -297,6 +307,11 @@ tailwind.config = {
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
     Also on February 14, the first tools for comparing the simulation against the reference timelapse were built. This required solving a non-trivial alignment problem: the reference video uses a different map projection, different extent, different resolution. An 8-point geographic calibration with affine transforms aligned the two coordinate systems.
   </p>
+
+  <figure class="my-10">
+    <img src="images/ww2-map/calibration-check.png" alt="Calibration alignment check" class="w-full rounded-lg shadow-lg">
+    <figcaption class="img-caption text-center">The calibration check: the reference frame with Berlin and Moscow markers verifying the 8-point geographic alignment between the two coordinate systems.</figcaption>
+  </figure>
   <p class="font-body text-lg leading-relaxed mb-5">
     By February 15, a live-compute comparison mode was working. The rendering pipeline could produce side-by-side composites: our field grid next to the reference frame, with the simulation's front line (yellow contour) overlaid on both. For the first time, we could see exactly where the simulation agreed with history and where it diverged.
   </p>
@@ -358,6 +373,16 @@ tailwind.config = {
   <p class="font-body text-lg leading-relaxed mb-5">
     Red-excess isolates Axis territory. A sigmoid normalizes the signal. A median filter kills noise. Island removal eliminates small disconnected regions. Erosion tightens boundaries. Finally, contour tracing extracts the front line as a polyline&mdash;geometry derived entirely from pixel colors, with no knowledge of events or cities.
   </p>
+
+  <figure class="my-10">
+    <img src="images/ww2-map/border-analysis.png" alt="Border zone analysis" class="w-full max-w-md mx-auto rounded-lg shadow-lg">
+    <figcaption class="img-caption text-center">Border zone analysis: the reference frame (top), classified field (middle), and red-excess signal with extracted contour (bottom). Each stage is purely pixel-derived.</figcaption>
+  </figure>
+
+  <figure class="my-10">
+    <img src="images/ww2-map/leningrad-zoom-f05.png" alt="Leningrad siege area detail" class="w-full rounded-lg shadow-lg">
+    <figcaption class="img-caption text-center">Leningrad, July 1941. Four-panel zoom: reference frame, red-excess contour, classified field, and extraction overlay. The siege corridor is visible in all four views.</figcaption>
+  </figure>
   <p class="font-body text-lg leading-relaxed mb-5">
     The pipeline ran on all 60 frames of the reference timelapse, producing 60 extracted front lines and comparison composites. Each showed precisely where the simulation's contour diverged from the reference's contour. Feedback was recorded per date:
   </p>
@@ -383,6 +408,18 @@ Corridors Added:
     December 18, 1941. The verification view: no styling, just the raw contour on a geographic grid. Red dots are calibration cities. Pink regions are pockets.
   </figcaption>
 </figure>
+
+<!-- Comparison: old classify vs new rE-field -->
+<div class="grid md:grid-cols-2 gap-4 mb-8 mt-8">
+  <figure>
+    <img src="images/ww2-map/compare-f10.png" alt="Comparison August 1941" class="w-full rounded shadow-lg">
+    <figcaption class="img-caption text-center">August 1941. Left: old classification. Right: new red-excess field. Top: reference overlay. Bottom: extracted territory. The rE-field captures the front line more faithfully.</figcaption>
+  </figure>
+  <figure>
+    <img src="images/ww2-map/compare-f30.png" alt="Comparison December 1941" class="w-full rounded shadow-lg">
+    <figcaption class="img-caption text-center">December 1941. The deepest Axis advance. The new extraction (right) produces a cleaner, more accurate front line than the old classifier (left).</figcaption>
+  </figure>
+</div>
 
 <!-- Oct composite -->
 <figure class="mb-16 mt-8">
