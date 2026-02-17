@@ -67,21 +67,29 @@ tailwind.config = {
 
 <!-- ═══════ HERO: Interactive Map ═══════ -->
 <section class="mb-16 -mx-6">
-  <div class="bg-black rounded-lg overflow-hidden shadow-2xl" style="height: 500px;">
-    <iframe
-      src="../map/index.html?renderer=legacy"
-      width="100%"
-      height="100%"
-      style="border: none;"
-      loading="lazy"
-      title="Interactive Eastern Front Map"
-    ></iframe>
+  <div id="map-container" class="bg-black rounded-lg overflow-hidden shadow-2xl relative cursor-pointer" style="height: 500px;" onclick="loadMap()">
+    <img src="images/ww2-map/app-screenshot.png" alt="Interactive Eastern Front Map preview" class="w-full h-full object-cover opacity-80">
+    <div id="map-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
+      <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mb-4 backdrop-blur-sm">
+        <svg class="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+      </div>
+      <p class="font-sans text-white text-lg font-medium">Launch Interactive Map</p>
+      <p class="font-sans text-white/60 text-sm mt-1">Click to load the simulation</p>
+    </div>
   </div>
   <p class="img-caption text-center mt-3 px-6">
     The interactive map. Drag to pan, scroll to zoom, use the timeline at the bottom to scrub through dates.
     <a href="../map/index.html?renderer=legacy" class="text-wsj-accent hover:underline" target="_blank">Open fullscreen &rarr;</a>
   </p>
 </section>
+<script>
+function loadMap() {
+  var container = document.getElementById('map-container');
+  container.onclick = null;
+  container.classList.remove('cursor-pointer');
+  container.innerHTML = '<iframe src="../map/index.html?renderer=legacy" width="100%" height="100%" style="border:none;" title="Interactive Eastern Front Map" sandbox="allow-scripts allow-same-origin"></iframe>';
+}
+</script>
 
 <!-- ═══════ ACT I ═══════ -->
 <article class="mb-20 max-w-3xl mx-auto">
