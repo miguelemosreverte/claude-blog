@@ -79,7 +79,7 @@ tailwind.config = {
   </div>
   <p class="img-caption text-center mt-3 px-6">
     The interactive map. Drag to pan, scroll to zoom, use the timeline at the bottom to scrub through dates.
-    <a href="../map/index.html?renderer=legacy" class="text-wsj-accent hover:underline" target="_blank">Open fullscreen &rarr;</a>
+    <a href="../map/" class="text-wsj-accent hover:underline" target="_blank">Open fullscreen &rarr;</a>
   </p>
 </section>
 <script>
@@ -87,7 +87,7 @@ function loadMap() {
   var container = document.getElementById('map-container');
   container.onclick = null;
   container.classList.remove('cursor-pointer');
-  container.innerHTML = '<iframe src="../map/index.html?renderer=legacy" width="100%" height="100%" style="border:none;" title="Interactive Eastern Front Map" sandbox="allow-scripts allow-same-origin"></iframe>';
+  container.innerHTML = '<iframe src="../map/" width="100%" height="100%" style="border:none;" title="Interactive Eastern Front Map" sandbox="allow-scripts allow-same-origin"></iframe>';
 }
 </script>
 

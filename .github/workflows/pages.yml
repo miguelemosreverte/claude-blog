@@ -33,6 +33,7 @@ jobs:
           cp posts/*.html _site/posts/
           cp -r posts/images/* _site/posts/images/
           cp -r map _site/map
+          cp -r map-data _site/map-data
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

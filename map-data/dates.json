@@ -1,0 +1,132 @@
+[
+  {
+    "date": "1941-06-22",
+    "label": "Jun '41",
+    "sublabel": "Operation Barbarossa Begins"
+  },
+  {
+    "date": "1941-08-15",
+    "label": "Aug '41",
+    "sublabel": "Fall of Smolensk · Baltic Campaign"
+  },
+  {
+    "date": "1941-09-20",
+    "label": "Sep '41",
+    "sublabel": "Fall of Kiev · Siege of Leningrad"
+  },
+  {
+    "date": "1941-10-15",
+    "label": "Oct '41",
+    "sublabel": "Operation Typhoon · Drive on Moscow"
+  },
+  {
+    "date": "1941-11-25",
+    "label": "Nov '41",
+    "sublabel": "Gates of Moscow · Maximum Advance"
+  },
+  {
+    "date": "1941-12-20",
+    "label": "Dec '41",
+    "sublabel": "Soviet Counter-Offensive at Moscow"
+  },
+  {
+    "date": "1942-01-20",
+    "label": "Jan '42",
+    "sublabel": "Soviet Winter Offensive Continues"
+  },
+  {
+    "date": "1942-05-20",
+    "label": "May '42",
+    "sublabel": "Stabilized Front · Kharkov Fails"
+  },
+  {
+    "date": "1942-07-20",
+    "label": "Jul '42",
+    "sublabel": "Case Blue · Drive to the Don"
+  },
+  {
+    "date": "1942-09-20",
+    "label": "Sep '42",
+    "sublabel": "Battle of Stalingrad · Caucasus"
+  },
+  {
+    "date": "1942-11-23",
+    "label": "Nov '42",
+    "sublabel": "Operation Uranus · Encirclement"
+  },
+  {
+    "date": "1943-02-15",
+    "label": "Feb '43",
+    "sublabel": "Fall of the 6th Army · Soviet Advance"
+  },
+  {
+    "date": "1943-03-20",
+    "label": "Mar '43",
+    "sublabel": "German Counter-Attack at Kharkov"
+  },
+  {
+    "date": "1943-07-05",
+    "label": "Jul '43",
+    "sublabel": "Operation Citadel · Battle of Kursk"
+  },
+  {
+    "date": "1943-08-25",
+    "label": "Aug '43",
+    "sublabel": "Soviet Strategic Offensive"
+  },
+  {
+    "date": "1943-10-20",
+    "label": "Oct '43",
+    "sublabel": "Race to the Dnieper"
+  },
+  {
+    "date": "1943-12-15",
+    "label": "Dec '43",
+    "sublabel": "Kiev Liberated · Dnieper Bridgeheads"
+  },
+  {
+    "date": "1944-02-15",
+    "label": "Feb '44",
+    "sublabel": "Korsun Pocket · Leningrad Relieved"
+  },
+  {
+    "date": "1944-05-15",
+    "label": "May '44",
+    "sublabel": "Crimea Recaptured · Spring Lull"
+  },
+  {
+    "date": "1944-07-20",
+    "label": "Jul '44",
+    "sublabel": "Operation Bagration · AG Centre Destroyed"
+  },
+  {
+    "date": "1944-09-20",
+    "label": "Sep '44",
+    "sublabel": "Balkans · Vistula Bridgeheads"
+  },
+  {
+    "date": "1944-11-20",
+    "label": "Nov '44",
+    "sublabel": "Budapest Siege · Courland Pocket"
+  },
+  {
+    "date": "1945-01-20",
+    "label": "Jan '45",
+    "sublabel": "Vistula-Oder Offensive"
+  },
+  {
+    "date": "1945-03-20",
+    "label": "Mar '45",
+    "sublabel": "Advance to the Oder · East Prussia Falls"
+  },
+  {
+    "date": "1945-04-25",
+    "label": "Apr '45",
+    "sublabel": "Battle of Berlin"
+  },
+  {
+    "date": "1945-05-09",
+    "label": "May '45",
+    "sublabel": "Victory in Europe"
+  }
+]
