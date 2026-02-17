@@ -65,31 +65,22 @@ tailwind.config = {
 
 <main class="max-w-4xl mx-auto px-6 py-10">
 
-<!-- ═══════ HERO: Interactive Map ═══════ -->
+<!-- ═══════ HERO: Looping Map ═══════ -->
 <section class="mb-16 -mx-6">
-  <div id="map-container" class="bg-black rounded-lg overflow-hidden shadow-2xl relative cursor-pointer" style="height: 500px;" onclick="loadMap()">
-    <img src="images/ww2-map/app-screenshot.png" alt="Interactive Eastern Front Map preview" class="w-full h-full object-cover opacity-80">
-    <div id="map-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
-      <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mb-4 backdrop-blur-sm">
-        <svg class="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
-      </div>
-      <p class="font-sans text-white text-lg font-medium">Launch Interactive Map</p>
-      <p class="font-sans text-white/60 text-sm mt-1">Click to load the simulation</p>
-    </div>
+  <div class="bg-black rounded-lg overflow-hidden shadow-2xl" style="height: 500px;">
+    <iframe
+      src="../map/"
+      width="100%"
+      height="100%"
+      style="border: none;"
+      title="Interactive Eastern Front Map"
+    ></iframe>
   </div>
   <p class="img-caption text-center mt-3 px-6">
-    The interactive map. Drag to pan, scroll to zoom, use the timeline at the bottom to scrub through dates.
+    The simulation loops through 26 keyframe dates from June 1941 to May 1945. Use arrow keys to step through manually.
     <a href="../map/" class="text-wsj-accent hover:underline" target="_blank">Open fullscreen &rarr;</a>
   </p>
 </section>
-<script>
-function loadMap() {
-  var container = document.getElementById('map-container');
-  container.onclick = null;
-  container.classList.remove('cursor-pointer');
-  container.innerHTML = '<iframe src="../map/" width="100%" height="100%" style="border:none;" title="Interactive Eastern Front Map" sandbox="allow-scripts allow-same-origin"></iframe>';
-}
-</script>
 
 <!-- ═══════ ACT I ═══════ -->
 <article class="mb-20 max-w-3xl mx-auto">
@@ -100,10 +91,10 @@ function loadMap() {
   </div>
 
   <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
-    The Eastern Front of World War II stretched from the Arctic to the Black Sea. Over four years, the front line shifted across thousands of kilometers as armies of millions advanced, retreated, encircled, and were encircled. Miguel wanted to build an interactive map that showed this movement&mdash;not as a static image, but as a living simulation you could scrub through in time, watching the front line breathe.
+    The Eastern Front of World War II stretched from the Arctic to the Black Sea. Over four years, the front line shifted across thousands of kilometers as armies of millions advanced, retreated, encircled, and were encircled. Miguel wanted to build an interactive map that showed this movement&mdash;not as a static image, but as a living simulation you could step through in time, watching the front line breathe.
   </p>
   <p class="font-body text-lg leading-relaxed mb-5">
-    The conventional approach would be to draw front lines by hand for each date, like an animated GIF of hand-traced maps. But that approach doesn't scale, doesn't allow for interactive exploration, and most importantly, doesn't <em>explain</em> anything. Miguel chose a radically different approach: model territorial control as a continuous scalar field, like a physics simulation.
+    The conventional approach would be to draw front lines by hand for each date, like an animated GIF of hand-traced maps. But that approach doesn't scale, doesn't allow for exploration, and most importantly, doesn't <em>explain</em> anything. Miguel chose a radically different approach: model territorial control as a continuous scalar field, like a physics simulation.
   </p>
 </article>
 
@@ -135,15 +126,75 @@ function loadMap() {
   <p class="font-body text-lg leading-relaxed mb-5">
     There is something audacious about this. No special cases for encirclements, pockets, or salients. No pathfinding algorithms. No rule engine. Just arithmetic on labeled data points. Pockets <em>emerge</em> naturally as isolated positive regions in a negative sea. The front line <em>emerges</em> as the zero contour. All complexity lives in the data, not the algorithm.
   </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    Each city's weight is modulated by labels that explain <em>why</em> it has the strength it does: supply disruption, air superiority, attrition, weather. These aren't decorative metadata&mdash;they're penalty multipliers that compound. A city with <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">supply_disruption: 0.5</code> and <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">weather: 0.3</code> has its weight reduced to 35% of nominal. The data records not just what happened, but why.
-  </p>
 </article>
 
 <!-- ═══════ ACT III ═══════ -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
     <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act III</p>
+    <h2 class="font-headline text-3xl font-bold">The Event System</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    The simulation is driven entirely by events&mdash;small, atomic records that say what happened, where, and why. Each event is a tuple: a date, a city, a control state, and a set of labels. That's it. There are no other inputs to the system.
+  </p>
+
+  <div class="bg-wsj-light border border-gray-200 rounded p-5 my-8 font-mono text-sm overflow-x-auto">
+    <pre class="text-wsj-ink leading-relaxed">["1942-08-23", "vertyachy", "axis", {
+  "operation": "blau",
+  "unit_army_group": "ag_b",
+  "unit_army": "6th_army",
+  "unit_corps": "xiv_panzer_corps",
+  "unit_division": "16th_panzer",
+  "commander": "paulus",
+  "note": "16th Panzer Division crosses Don at Vertyachy,
+          drives 60km to Volga in single day.",
+  "attrition": 0
+}]</pre>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The labels serve two purposes. Some are <strong>penalty labels</strong>&mdash;<code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">supply_disruption</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">attrition</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">air_superiority</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">frostbite_casualties</code>&mdash;that reduce a city's effective weight in the density field. A city with <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">supply_disruption: 0.5</code> and <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">attrition: 0.3</code> has its weight reduced to 35% of nominal. The penalties compound multiplicatively. The rest are <strong>metadata labels</strong>&mdash;operation names, unit designations, commanders, notes&mdash;that explain the event in human terms. These don't affect the simulation directly, but they make the dataset self-documenting.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The system is event-sourced: the state at any date is computed by replaying all events up to that point. There is no mutable state. No database to migrate. The canonical history is a stream of immutable facts, and the current state of every city is a pure function of that stream.
+  </p>
+</article>
+
+<!-- ═══════ ACT IV ═══════ -->
+<article class="mb-20 max-w-3xl mx-auto">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act IV</p>
+    <h2 class="font-headline text-3xl font-bold">Campaigns and the Merge</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    The 5,500 events are not stored in a single file. They're partitioned across 12 campaign directories&mdash;<code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">barbarossa/</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">uranus/</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">kursk/</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">bagration/</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">berlin/</code>&mdash;each containing numbered JSON files. The Barbarossa directory alone has dozens of files: <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">001-pockets.json</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">004-june-opening.json</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">005-july-advances.json</code>. Each file has a metadata block that records who wrote it, when, and why.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    A merge tool globs all 240 JSON files, deduplicates cities, concatenates events, sorts them by date, and produces a single 6 MB document: <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">eastern-front.json</code>. This is the write side of a CQRS architecture. The read side is a Rust builder that pre-computes density field grids, marching-squares contours, and city states for every date, then writes them to a SQLite database. The GPU (Metal on M4 Pro) computes all 1,067 dates in five seconds.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    This partitioning is what made multi-agent collaboration possible. Multiple Claude agents worked in parallel, each assigned a campaign directory. A Barbarossa agent researched the opening weeks. A Uranus agent handled the Stalingrad encirclement&mdash;its directory grew to 38 files as the encirclement events were refined through dozens of iterations. A Kursk agent covered the summer of 1943. They could work simultaneously without merge conflicts because events were partitioned by directory, and the merge tool combined them deterministically.
+  </p>
+
+  <div class="pull-quote my-10 py-6 px-2">
+    <p class="font-headline text-2xl italic text-center leading-snug">
+      240 JSON files, 12 campaign directories,<br>one merge tool, zero conflicts.
+    </p>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    A <strong>resource conservation principle</strong> prevented the most common failure of collaborative data entry: inflation. Resources&mdash;manpower, ammunition, fuel&mdash;were finite. Every resource at every city had to be traceable to an explicit event. Like Rust's ownership model applied to historical data, this constraint made structural corruption impossible. When the Uranus agent needed Soviet troops for the encirclement, those troops had to come from somewhere&mdash;from specific armies (5th Tank, 21st, 51st, 57th) with known troop strengths. The metadata block in each event file records the agent's reasoning, creating an audit trail.
+  </p>
+</article>
+
+<!-- ═══════ ACT V ═══════ -->
+<article class="mb-20 max-w-3xl mx-auto">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act V</p>
     <h2 class="font-headline text-3xl font-bold">The First Front Line</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
@@ -192,10 +243,10 @@ function loadMap() {
   </div>
 </article>
 
-<!-- ═══════ ACT IV ═══════ -->
+<!-- ═══════ ACT VI ═══════ -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act IV</p>
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VI</p>
     <h2 class="font-headline text-3xl font-bold">The Extraction Pipeline</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
@@ -230,10 +281,10 @@ function loadMap() {
   </p>
 </article>
 
-<!-- ═══════ ACT V ═══════ -->
+<!-- ═══════ ACT VII ═══════ -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act V</p>
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VII</p>
     <h2 class="font-headline text-3xl font-bold">Iterative Refinement</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
@@ -251,19 +302,10 @@ function loadMap() {
   </figcaption>
 </figure>
 
-<article class="mb-20 max-w-3xl mx-auto">
-  <p class="font-body text-lg leading-relaxed mb-5">
-    Multiple Claude agents worked in parallel, each assigned a campaign directory. A Barbarossa agent researched the opening weeks. A Uranus agent handled the Stalingrad encirclement. A Kursk agent covered the summer of 1943. They could work simultaneously without conflicts because events were partitioned by directory, and the merge tool combined them alphabetically.
-  </p>
-  <p class="font-body text-lg leading-relaxed mb-5">
-    A <strong>resource conservation principle</strong> prevented the most common failure of collaborative data entry: inflation. Resources&mdash;manpower, ammunition, fuel&mdash;were finite. Every resource at every city had to be traceable to an explicit event. Like Rust's ownership model applied to historical data, this constraint made structural corruption impossible.
-  </p>
-</article>
-
-<!-- ═══════ ACT VI ═══════ -->
+<!-- ═══════ ACT VIII ═══════ -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VI</p>
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VIII</p>
     <h2 class="font-headline text-3xl font-bold">The Verification Grid</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
@@ -277,7 +319,7 @@ function loadMap() {
 <figure class="mb-8">
   <img src="images/ww2-map/verify-dec-1941.png" alt="Verification grid for December 1941" class="w-full rounded-lg shadow-lg">
   <figcaption class="img-caption text-center">
-    Verification view for December 18, 1941. The yellow contour is the computed front line. Red dots are calibration cities (Berlin, Tallinn, Gdansk, Riga, Odessa, Sevastopol). White dots are regular cities. The geographic grid shows latitude/longitude for spatial validation. Pink regions indicate pockets or contested areas.
+    Verification view for December 18, 1941. The yellow contour is the computed front line. Red dots are calibration cities. White dots are regular cities. Pink regions indicate pockets or contested areas.
   </figcaption>
 </figure>
 
@@ -287,10 +329,10 @@ function loadMap() {
   </p>
 </article>
 
-<!-- ═══════ ACT VII ═══════ -->
+<!-- ═══════ ACT IX ═══════ -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VII</p>
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act IX</p>
     <h2 class="font-headline text-3xl font-bold">The Tooling</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
@@ -304,14 +346,14 @@ function loadMap() {
       <span class="font-headline text-xl font-bold text-wsj-accent leading-none mt-1">1</span>
       <div>
         <p class="font-sans text-sm font-semibold mb-1">Merge pipeline</p>
-        <p class="font-body text-base text-wsj-caption">240 JSON event files across 14 campaign directories, merged into a single 6MB document, sorted by date.</p>
+        <p class="font-body text-base text-wsj-caption">240 JSON event files across 12 campaign directories, merged into a single 6MB document, sorted by date.</p>
       </div>
     </div>
     <div class="flex gap-4 items-start">
       <span class="font-headline text-xl font-bold text-wsj-accent leading-none mt-1">2</span>
       <div>
         <p class="font-sans text-sm font-semibold mb-1">Rust read-side builder</p>
-        <p class="font-body text-base text-wsj-caption">Pre-computes density field grids, marching-squares contours, and city states for every date. Outputs a SQLite database for instant UI loading.</p>
+        <p class="font-body text-base text-wsj-caption">Pre-computes density field grids, marching-squares contours, and city states for every date. GPU-accelerated via Metal on M4 Pro. Outputs a SQLite database for instant UI loading.</p>
       </div>
     </div>
     <div class="flex gap-4 items-start">
@@ -345,18 +387,10 @@ function loadMap() {
   </div>
 </article>
 
-<!-- App screenshot -->
-<figure class="mb-16">
-  <img src="images/ww2-map/app-screenshot.png" alt="The interactive map application" class="w-full rounded-lg shadow-lg">
-  <figcaption class="img-caption text-center">
-    The interactive map application. Dark theme with atmospheric lighting. Axis territory in grey-blue, Soviet in deep red. The golden front line glows with a multi-layer effect. The timeline at bottom shows the full war with period labels. Cities are marked with control-colored dots.
-  </figcaption>
-</figure>
-
-<!-- ═══════ ACT VIII ═══════ -->
+<!-- ═══════ ACT X ═══════ -->
 <article class="mb-20 max-w-3xl mx-auto">
   <div class="text-center mb-8">
-    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VIII</p>
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act X</p>
     <h2 class="font-headline text-3xl font-bold">What Emerged</h2>
     <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
   </div>
@@ -365,7 +399,7 @@ function loadMap() {
     The project today contains 5,500 historical events across 1,450 cities, organized in 240 JSON files covering every major campaign from Barbarossa to Berlin. The simulation produces front lines that visually match the reference timelapse across the first year of the war, with coverage extending through 1942 and into the later campaigns.
   </p>
   <p class="font-body text-lg leading-relaxed mb-5">
-    But the most interesting thing about the project is not what it produces. It's what it <em>is</em>. It's a labeled dataset where every data point explains its own causality. When you look at the event for Stalingrad's fall, you don't just see a control state change&mdash;you see supply disruption at 0.8, attrition at 0.6, the name of the operation, and a human-written note explaining what happened. The simulation is arithmetic. The understanding is in the labels.
+    But the most interesting thing about the project is not what it produces. It's what it <em>is</em>. It's a labeled dataset where every data point explains its own causality. When you look at the event for the 16th Panzer Division crossing the Don at Vertyachy, you don't just see a control state change&mdash;you see the corps, the division, the commander, the troop count, and a note explaining that they drove 60km to the Volga in a single day. The simulation is arithmetic. The understanding is in the labels.
   </p>
 
   <div class="pull-quote my-10 py-6 px-2">
@@ -373,10 +407,6 @@ function loadMap() {
       The simulation is arithmetic.<br>The understanding is in the labels.
     </p>
   </div>
-
-  <p class="font-body text-lg leading-relaxed mb-5">
-    The project also demonstrated something about human-AI collaboration that surprised us both. The multi-agent architecture&mdash;Event Agents researching history, Simulation Agents tuning math, a Supervisor enforcing quality&mdash;worked because each agent had strict boundaries and a clear contract. The resource conservation principle prevented collaborative corruption. The merge tool resolved conflicts by file order rather than negotiation. These are software engineering patterns applied to historical research, and they worked.
-  </p>
 </article>
 
 <!-- Oct 1941 composite -->
