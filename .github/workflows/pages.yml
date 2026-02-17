@@ -28,9 +28,11 @@ jobs:
 
       - name: Create site directory
         run: |
-          mkdir -p _site/posts
+          mkdir -p _site/posts/images
           cp index.html _site/
           cp posts/*.html _site/posts/
+          cp -r posts/images/* _site/posts/images/
+          cp -r map _site/map
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

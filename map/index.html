@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/claude-blog/map/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Eastern Front — Interactive Map</title>
+    <script>
+      // Force legacy renderer (no SQLite DB needed)
+      if (!window.location.search.includes('renderer=')) {
+        const url = new URL(window.location);
+        url.searchParams.set('renderer', 'legacy');
+        window.history.replaceState({}, '', url);
+      }
+    </script>
+    <script type="module" crossorigin src="/claude-blog/map/assets/index-Cpi14mRT.js"></script>
+    <link rel="stylesheet" crossorigin href="/claude-blog/map/assets/index-BpC6VBbP.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
