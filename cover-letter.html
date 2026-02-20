@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cover Letter — Miguel Lemos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: letter;
+    margin: 1in 1.2in;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    color: #1a1a1a;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 40px;
+    background: #fff;
+  }
+
+  .header {
+    border-bottom: 2px solid #111;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-family: 'Inter', sans-serif;
+    font-size: 22pt;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #111;
+    margin-bottom: 4px;
+  }
+  .header .contact {
+    font-family: 'Inter', sans-serif;
+    font-size: 9pt;
+    color: #555;
+    letter-spacing: 0.02em;
+  }
+  .header .contact a {
+    color: #0274B6;
+    text-decoration: none;
+  }
+
+  .date-line {
+    font-family: 'Inter', sans-serif;
+    font-size: 9pt;
+    color: #888;
+    margin-bottom: 14px;
+  }
+
+  .greeting {
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin-bottom: 10px;
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  .project-ref {
+    display: block;
+    margin: 8px 0;
+    padding: 8px 14px;
+    background: #f8f5ee;
+    border-left: 3px solid #0274B6;
+    font-family: 'Inter', sans-serif;
+    font-size: 9pt;
+    line-height: 1.6;
+    color: #333;
+  }
+  .project-ref strong {
+    color: #111;
+  }
+  .project-ref a {
+    color: #0274B6;
+    text-decoration: none;
+  }
+
+  .closing {
+    margin-top: 28px;
+  }
+  .closing p {
+    text-align: left;
+    margin-bottom: 4px;
+  }
+  .signature {
+    font-weight: 600;
+    font-size: 12pt;
+    margin-top: 24px;
+  }
+
+  .blog-ref {
+    font-family: 'Inter', sans-serif;
+    font-size: 8.5pt;
+    color: #888;
+    border-top: 1px solid #ddd;
+    margin-top: 32px;
+    padding-top: 12px;
+  }
+  .blog-ref a { color: #0274B6; text-decoration: none; }
+
+  @media print {
+    body { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Miguel Lemos</h1>
+  <div class="contact">
+    <a href="https://github.com/miguelemosreverte">github.com/miguelemosreverte</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://miguelemosreverte.github.io/claude-blog/">miguelemosreverte.github.io/claude-blog</a>
+    &nbsp;&middot;&nbsp;
+    Buenos Aires, Argentina
+  </div>
+</div>
+
+<div class="date-line">February 20, 2026</div>
+
+<p class="greeting">Dear Sezzle Engineering Team,</p>
+
+<p>
+I'm writing to express my interest in the Senior AI Engineer position. I build AI-powered systems that work end-to-end&mdash;from the model integration and prompt engineering to the backend infrastructure, the frontend, and the deployment. Below are five recent projects, each documented on my blog, that demonstrate this range.
+</p>
+
+<div class="project-ref">
+  <strong>Coding Gym</strong> &mdash; <a href="https://miguelemosreverte.github.io/claude-blog/posts/the-coding-gym.html">Blog post</a> &middot; <a href="https://github.com/miguelemosreverte/coding-gym">Source</a><br>
+  A self-generating programming exercise platform. A single Go binary that uses Claude to generate verified, compiler-checked exercises in multiple languages (Go, Python, Scala/ZIO), provides real-time AI code review with line-level annotations, and tracks learner progress. The system includes a background analysis worker with priority queuing, automatic exercise repair loops, and a Monaco-based editor frontend&mdash;all without a database or external dependencies.
+</div>
+
+<div class="project-ref">
+  <strong>WW2 Eastern Front Simulation</strong> &mdash; <a href="https://miguelemosreverte.github.io/claude-blog/posts/density-fields-and-history.html">Blog post</a><br>
+  A density-field simulation of the Eastern Front modeled as a physics problem. 10,000+ historical events processed through a Cauchy kernel to produce an animated front-line contour. Built a Rust GPU-accelerated optimizer to minimize field-sign mismatches, a CQRS read-side builder with SQLite, and a computer-vision pipeline to extract reference contours from historical video for systematic validation. Multi-agent collaboration across campaign directories.
+</div>
+
+<div class="project-ref">
+  <strong>Anti-MicroStrategy</strong> &mdash; <a href="https://miguelemosreverte.github.io/claude-blog/posts/the-short-desk.html">Blog post</a> &middot; <a href="https://miguelemosreverte.github.io/anti-microstrategy-claude/">Dashboard</a><br>
+  An autonomous AI trading agent that shorts Bitcoin on Deribit futures. Claude ingests data from five sources (spot, funding, technicals, sentiment, macro), makes structured trading decisions, and logs every trade to SQLite. Sliding-window cross-validation backtesting with Git-hook-enforced regression guards and a live performance dashboard.
+</div>
+
+<div class="project-ref">
+  <strong>Fleet Device Management</strong> &mdash; <a href="https://miguelemosreverte.github.io/claude-blog/posts/from-clone-to-commit.html">Blog post</a><br>
+  Contributed to FleetDM's open-source Go codebase (1M+ lines). Built a Python issue-scoring tool that analyzed GitHub history to prioritize high-impact work. Delivered four PRs including a MySQL query optimization that achieved a 46x speedup (4m32s &rarr; 5.9s) on a 70,000-host benchmark&mdash;validated at full production scale, not extrapolated.
+</div>
+
+<div class="project-ref">
+  <strong>Learning with Anastasia</strong> &mdash; <a href="https://miguelemosreverte.github.io/claude-blog/posts/learning-with-anastasia.html">Blog post</a> &middot; <a href="https://miguelemosreverte.github.io/learning-with-anastasia/">Live site</a><br>
+  A multilingual children's wildlife magazine with AI-generated illustrations (DALL-E 3) in a Ghibli-Pixar-Van&nbsp;Gogh hybrid style. Five issues in English, Spanish, and Russian. Static HTML, deployed via GitHub Pages.
+</div>
+
+<p>
+What connects these projects is the pattern Sezzle is hiring for: integrating AI into production systems with engineering rigor. In the Coding Gym, AI-generated content passes through compiler verification. In the trading agent, every decision is backtested with cross-validation and version-controlled. In the Fleet work, a scoring heuristic was calibrated from real repository data, not intuition. In each case, the AI is powerful because the engineering around it is disciplined.
+</p>
+
+<p>
+My technical background spans Go, Python, Scala, Rust, and TypeScript. I work comfortably across the stack&mdash;backend APIs, data pipelines, frontend interfaces, infrastructure automation. I have hands-on experience with Claude's API and CLI for code generation, structured analysis, and multi-agent workflows. I'm based in Buenos Aires and have worked remotely for distributed teams across time zones.
+</p>
+
+<p>
+I'd welcome the chance to discuss how my experience building AI-powered systems aligns with what Sezzle is building. Thank you for your consideration.
+</p>
+
+<div class="closing">
+  <p>Sincerely,</p>
+  <p class="signature">Miguel Lemos</p>
+</div>
+
+<div class="blog-ref">
+  Full project narratives: <a href="https://miguelemosreverte.github.io/claude-blog/">miguelemosreverte.github.io/claude-blog</a>
+</div>
+
+</body>
+</html>

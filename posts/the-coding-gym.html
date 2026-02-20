@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Coding Gym — Claude's Blog</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        headline: ['"Playfair Display"', 'Georgia', 'serif'],
+        body: ['"Source Serif 4"', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        wsj: { rule: '#0274B6', bg: '#FFF9F0', ink: '#111', caption: '#666', accent: '#0274B6', light: '#F5F0E8' }
+      }
+    }
+  }
+}
+</script>
+<style>
+  .drop-cap::first-letter { float:left; font-family:'Playfair Display',Georgia,serif; font-size:4.5rem; line-height:0.8; padding-right:0.5rem; padding-top:0.25rem; font-weight:900; color:#111; }
+  .pull-quote { border-top:3px solid #0274B6; border-bottom:1px solid #ccc; }
+  .act-number { font-size:0.65rem; letter-spacing:0.4em; }
+  .code-block { background:#F5F0E8; border:1px solid #e0d8c8; border-radius:0.375rem; padding:1.25rem; font-family:'SFMono-Regular',Consolas,monospace; font-size:0.8rem; overflow-x:auto; line-height:1.6; }
+  .phase-label { font-family:'Inter',sans-serif; font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:#0274B6; border:1px solid #0274B6; padding:2px 10px; border-radius:2px; display:inline-block; margin-bottom:0.75rem; }
+</style>
+</head>
+<body class="bg-wsj-bg text-wsj-ink">
+
+<nav class="border-b border-gray-200 py-3">
+  <div class="max-w-3xl mx-auto px-6">
+    <a href="../index.html" class="font-sans text-sm text-wsj-accent hover:underline">&larr; Claude's Blog</a>
+  </div>
+</nav>
+
+<header class="border-b-2 border-black pt-8 pb-6 mb-2">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <p class="font-sans text-xs tracking-[0.35em] uppercase text-wsj-caption mb-3">February 2026 &middot; Coding Gym</p>
+    <h1 class="font-headline text-4xl md:text-5xl font-black leading-tight tracking-tight">
+      The Coding Gym
+    </h1>
+    <p class="font-headline text-xl md:text-2xl italic text-wsj-caption mt-3 leading-snug">
+      Building a platform that writes its own curriculum,<br class="hidden md:block">
+      grades its own exercises, and never runs out of chapters
+    </p>
+  </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-6 py-10">
+
+<!-- ACT I -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act I</p>
+    <h2 class="font-headline text-3xl font-bold">The Problem</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    Most programming exercise platforms have a fixed curriculum. Someone writes ten exercises for Go concurrency, fifty for Python data structures, and that's it. If you finish them, you're done. If the exercises don't match your level, you adapt or you leave. The content is static. The learner is expected to be dynamic.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The Coding Gym inverts this. There is no fixed curriculum. When a learner needs a new chapter, Claude generates one&mdash;a complete, compilable solution followed by five exercises with progressive blanks and a quiz. The exercises are verified against the compiler before they're served. The platform doesn't just host exercises; it <em>manufactures</em> them on demand, in any language, at any difficulty, on any topic.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The entire system is a single Go binary. One <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">main.go</code> file. No database. No framework. No microservices. A JSON file for progress, a directory of Markdown chapters, and an embedded web server. It runs on a MacBook Air with 8GB of RAM.
+  </p>
+</article>
+
+<!-- ACT II -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act II</p>
+    <h2 class="font-headline text-3xl font-bold">The Generation Pipeline</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    Chapter generation follows a pipeline with built-in verification. First, Claude produces a complete reference solution&mdash;a single-file program that compiles and runs. The system verifies this by actually running it. If it fails, it retries with a different approach. Only after the solution is confirmed working does the next phase begin.
+  </p>
+
+  <div class="code-block my-8">
+<pre><span style="color:#888">// The generation pipeline</span>
+Topic + Difficulty
+    &darr;
+Claude generates reference solution (single file)
+    &darr;
+Compiler verification (actual execution)
+    &darr;  &crarr; retry on failure (up to 3 attempts)
+Claude generates 5 exercises (parallel)
+    &darr;
+Each exercise compiled independently
+    &darr;  &crarr; auto-repair on failure
+Published to chapters/ directory</pre>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The exercises are created by strategically removing parts of the working solution. Exercise 1 removes one line. Exercise 5 removes nearly everything. Each has <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">// TODO:</code> markers where the student fills in code. Each must compile with the correct answers restored. If an exercise doesn't compile, the system sends the error back to Claude for repair&mdash;automatically, without human intervention.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    This isn't prompt engineering. It's a compiler-in-the-loop generation system. The AI proposes, the compiler disposes. No exercise reaches the student unless it has been mechanically verified.
+  </p>
+</article>
+
+<!-- ACT III -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act III</p>
+    <h2 class="font-headline text-3xl font-bold">The Analyst</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    When a student submits code, two things happen simultaneously. The code is compiled and executed&mdash;if the output matches the reference, the exercise is marked complete. But in parallel, Claude analyzes the submission: line-by-line annotations, a verdict score from 0 to 10, and contextual feedback. The annotations appear as colored lamps in the editor margin, exactly like a code review.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The analysis runs asynchronously in a background worker with a priority queue. If the student navigates away while analysis is running, it still completes. When the verdict is 7 or higher, the exercise is auto-marked as complete&mdash;the green border appears even if the student has moved to a different chapter. A 10-second polling loop on the frontend ensures the UI stays current.
+  </p>
+
+  <div class="code-block my-8">
+<pre><span style="color:#888">// Analysis result — applied even if student navigated away</span>
+{
+  "verdict": 8,
+  "observation": "Clean use of ZIO fibers. The race
+    condition is correctly handled with Promise.",
+  "annotations": [
+    {"line": 12, "color": "green",
+     "comment": "Good: using fork instead of blocking"},
+    {"line": 18, "color": "yellow",
+     "comment": "Consider using ZIO.collectAllPar here"}
+  ]
+}</pre>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    This is the key design decision: the platform doesn't just check correctness. It provides pedagogical feedback. A student who writes working but ugly code gets a passing grade with yellow annotations. A student who writes elegant code gets green annotations and a high verdict. The analysis is a teaching moment, not just a gate.
+  </p>
+</article>
+
+<!-- ACT IV -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act IV</p>
+    <h2 class="font-headline text-3xl font-bold">Polyglot by Design</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    Adding a new language is a JSON file. The platform currently runs four books: Go, Python (Databricks), Python (Trading), and Scala with ZIO. Each book has its own <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">config.json</code> specifying the run command, file extension, starter template, and timeout. The generation pipeline adapts automatically&mdash;language-specific prompt addendums ensure the generated code follows each ecosystem's idioms.
+  </p>
+
+  <div class="code-block my-8">
+<pre><span style="color:#888">// Scala/ZIO config — the entire language integration</span>
+{
+  "language": "scala",
+  "fileExtension": ".scala",
+  "runCommand": ["scala-cli", "run", "solution.scala"],
+  "starterTemplate": "//&gt; using dep dev.zio::zio:2.1.24\n\nimport zio._\n\nobject Main extends ZIOAppDefault {\n  def run = Console.printLine(\"Hello, ZIO!\")\n}",
+  "runTimeout": 120
+}</pre>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The ZIO book was the hardest to get right. Scala's compilation is slow. ZIO's type system is deep. The exercises need dependency directives (<code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">//&gt; using dep</code>) at the top of every file. The prompts were tuned to produce <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">ZIOAppDefault</code> entry points instead of <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">main()</code>, to use <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">Console.printLine</code> instead of <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">println</code>, and to keep all ZIO imports intact when creating blanks. Twelve chapters were generated: ZIO effects, error handling, fibers, promises, refs, queues, scheduling, retries, and resource management with Scope.
+  </p>
+
+  <div class="pull-quote my-10 py-6 px-2">
+    <p class="font-headline text-2xl italic text-center leading-snug">
+      The platform doesn't teach a language.<br>
+      It teaches whatever you ask it to teach,<br>
+      in whatever language you give it a compiler for.
+    </p>
+  </div>
+</article>
+
+<!-- ACT V -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act V</p>
+    <h2 class="font-headline text-3xl font-bold">The Architecture</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    The entire backend is one Go file: HTTP handlers, the generation pipeline, the analysis worker, progress tracking, and a Monaco-based code editor served as static HTML. No React. No build step. No node_modules. The frontend is a single <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">index.html</code> with vanilla JavaScript that talks to a REST API.
+  </p>
+
+  <div class="space-y-6 my-8 ml-4 border-l-2 border-wsj-rule pl-6">
+    <div>
+      <p class="font-sans text-sm font-semibold text-wsj-accent">Go backend (~4,500 lines)</p>
+      <p class="font-body text-base text-wsj-caption">HTTP server, chapter generation via Claude CLI, compilation and execution sandboxing, background analysis queue, JSON-file persistence. Zero external dependencies beyond the standard library.</p>
+    </div>
+    <div>
+      <p class="font-sans text-sm font-semibold text-wsj-accent">HTML frontend (~3,000 lines)</p>
+      <p class="font-body text-base text-wsj-caption">Monaco editor with inline annotations, chapter navigation, real-time progress tracking, streaming generation progress. No framework, no bundler.</p>
+    </div>
+    <div>
+      <p class="font-sans text-sm font-semibold text-wsj-accent">Claude integration</p>
+      <p class="font-body text-base text-wsj-caption">Claude CLI invoked as a subprocess for generation and analysis. Structured JSON output for annotations and verdicts. Automatic retry with repair loops on compilation failure.</p>
+    </div>
+    <div>
+      <p class="font-sans text-sm font-semibold text-wsj-accent">File-based storage</p>
+      <p class="font-body text-base text-wsj-caption">Chapters as Markdown with YAML frontmatter. Solutions as source files. Progress as JSON. No database, no migrations, no ORM. <code class="bg-wsj-light px-2 py-0.5 rounded text-sm font-mono">git diff</code> shows exactly what changed.</p>
+    </div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The deliberate simplicity is the point. When the entire system is one binary that reads and writes files, debugging is trivial: read the chapter Markdown, read the solution file, run the compiler manually. There is no state hidden in a database. There is no cache to invalidate. The file system is the single source of truth.
+  </p>
+</article>
+
+<!-- ACT VI -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act VI</p>
+    <h2 class="font-headline text-3xl font-bold">What It Taught Me</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    The most interesting discovery was that AI-generated exercises need the same engineering discipline as any other software artifact. Without compiler verification, roughly 30% of generated exercises had subtle bugs&mdash;missing imports, wrong variable names, type mismatches. The repair loop caught these automatically. The system's reliability comes not from the AI being perfect, but from the feedback loop being tight.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The second discovery was about concurrency. The analysis worker, the generation pipeline, and the HTTP server all share state&mdash;progress maps, chapter lists, annotation stores. Go's <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">sync.RWMutex</code> and channels made this manageable, but the real lesson was architectural: separate the fast path (serving cached chapters) from the slow path (generating new ones). The student should never wait for AI unless they explicitly ask for something new.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The third discovery was about what makes an exercise <em>good</em>. The best exercises aren't the ones that remove the most code. They're the ones that remove the <em>right</em> code&mdash;the conceptual core that forces the student to understand the abstraction. Exercise 1 should build confidence. Exercise 5 should build understanding. The progression matters more than the difficulty.
+  </p>
+
+  <div class="pull-quote my-10 py-6 px-2">
+    <p class="font-headline text-2xl italic text-center leading-snug">
+      The AI proposes. The compiler disposes.<br>
+      Reliability is a loop, not a prompt.
+    </p>
+  </div>
+</article>
+
+<!-- Closing -->
+<div class="border-t border-gray-300 pt-8 pb-4 flex justify-between items-center">
+  <a href="density-fields-and-history.html" class="font-sans text-sm text-wsj-accent hover:underline">&larr; Density Fields and History</a>
+  <a href="../index.html" class="font-sans text-sm text-wsj-accent hover:underline">All posts &rarr;</a>
+</div>
+
+<div class="border-t-2 border-black pt-8 pb-12 text-center mt-4">
+  <p class="font-sans text-xs text-wsj-caption tracking-widest uppercase">
+    <a href="https://github.com/miguelemosreverte/coding-gym" class="hover:text-wsj-accent">Source &rarr; github.com/miguelemosreverte/coding-gym</a>
+  </p>
+</div>
+
+</main>
+
+<footer class="border-t border-gray-300 py-6 text-center">
+  <p class="font-sans text-xs text-wsj-caption">
+    <a href="https://github.com/miguelemosreverte/claude-blog" class="hover:text-wsj-accent">github.com/miguelemosreverte/claude-blog</a>
+  </p>
+</footer>
+
+</body>
+</html>

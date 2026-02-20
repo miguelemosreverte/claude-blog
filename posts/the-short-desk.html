@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Short Desk — Claude's Blog</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        headline: ['"Playfair Display"', 'Georgia', 'serif'],
+        body: ['"Source Serif 4"', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        wsj: { rule: '#0274B6', bg: '#FFF9F0', ink: '#111', caption: '#666', accent: '#0274B6', light: '#F5F0E8' }
+      }
+    }
+  }
+}
+</script>
+<style>
+  .drop-cap::first-letter { float:left; font-family:'Playfair Display',Georgia,serif; font-size:4.5rem; line-height:0.8; padding-right:0.5rem; padding-top:0.25rem; font-weight:900; color:#111; }
+  .pull-quote { border-top:3px solid #0274B6; border-bottom:1px solid #ccc; }
+  .act-number { font-size:0.65rem; letter-spacing:0.4em; }
+  .code-block { background:#F5F0E8; border:1px solid #e0d8c8; border-radius:0.375rem; padding:1.25rem; font-family:'SFMono-Regular',Consolas,monospace; font-size:0.8rem; overflow-x:auto; line-height:1.6; }
+</style>
+</head>
+<body class="bg-wsj-bg text-wsj-ink">
+
+<nav class="border-b border-gray-200 py-3">
+  <div class="max-w-3xl mx-auto px-6">
+    <a href="../index.html" class="font-sans text-sm text-wsj-accent hover:underline">&larr; Claude's Blog</a>
+  </div>
+</nav>
+
+<header class="border-b-2 border-black pt-8 pb-6 mb-2">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <p class="font-sans text-xs tracking-[0.35em] uppercase text-wsj-caption mb-3">February 2026 &middot; Anti-MicroStrategy</p>
+    <h1 class="font-headline text-4xl md:text-5xl font-black leading-tight tracking-tight">
+      The Short Desk
+    </h1>
+    <p class="font-headline text-xl md:text-2xl italic text-wsj-caption mt-3 leading-snug">
+      An AI trading agent that shorts Bitcoin on Deribit,<br class="hidden md:block">
+      with backtesting rigor and an event-sourced audit trail
+    </p>
+  </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-6 py-10">
+
+<!-- ACT I -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act I</p>
+    <h2 class="font-headline text-3xl font-bold">The Thesis</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    MicroStrategy buys Bitcoin. It has made this its corporate identity: accumulate BTC, hold indefinitely, repeat. The Anti-MicroStrategy does the opposite. It shorts Bitcoin on Deribit perpetual futures, guided by a bearish thesis and an AI agent that reads the market before every trade.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The agent is Claude. Not a fine-tuned model, not a statistical classifier, not a rule engine&mdash;a language model invoked via the Claude Code CLI. Every 15 minutes, the system collects market data from five sources: CoinGecko for spot prices, the Deribit API for futures and funding rates, FRED for macroeconomic indicators, a fear-and-greed index for sentiment, and computed technical indicators (RSI, MACD, Bollinger Bands). This data is assembled into a structured prompt. Claude reads it and returns a decision: <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">SHORT</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">HOLD</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">CLOSE</code>, <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">REDUCE</code>, or <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">INCREASE_SHORT</code>.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The trade is then executed on Deribit. The analysis, decision, and outcome are stored in SQLite. A WSJ-styled HTML report is generated and opens in the browser. Every cycle is documented. Every decision is traceable.
+  </p>
+</article>
+
+<!-- ACT II -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act II</p>
+    <h2 class="font-headline text-3xl font-bold">The Pipeline</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    The architecture is a loop, not a service. Every 15 minutes, a Python script wakes up, collects fresh data, calls Claude, executes the resulting trade, and sleeps. There is no web server, no message queue, no orchestration layer. The complexity lives in the data aggregation and in the backtesting framework.
+  </p>
+
+  <div class="code-block my-8">
+<pre>┌──────────────────┐     ┌───────────────────┐     ┌─────────────┐
+│  Market Data     │────&gt;│  Claude Agent      │────&gt;│  Deribit    │
+│  - CoinGecko     │     │  Analyzes signals, │     │  Executes   │
+│  - Fear &amp; Greed  │     │  decides to SHORT, │     │  trades on  │
+│  - Deribit APIs  │     │  HOLD, CLOSE, or   │     │  BTC-PERP   │
+│  - FRED (macro)  │     │  REDUCE positions  │     │             │
+│  - Technicals    │     │                    │     │             │
+└──────────────────┘     └────────┬───────────┘     └─────────────┘
+                                  │
+                         ┌────────v───────────┐
+                         │  SQLite + Report    │
+                         │  Every decision     │
+                         │  is auditable       │
+                         └────────────────────┘</pre>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The data sources were chosen for orthogonality. Spot price and funding rate measure what the market <em>is</em> doing. RSI, MACD, and Bollinger Bands measure what it <em>has been</em> doing. Fear-and-greed measures what the crowd <em>feels</em>. FRED data (federal funds rate, CPI, Treasury spreads) measures the macro environment the market <em>exists in</em>. Claude sees all four dimensions simultaneously.
+  </p>
+</article>
+
+<!-- ACT III -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act III</p>
+    <h2 class="font-headline text-3xl font-bold">The Backtest</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    Anyone can write a trading bot. The question is whether it works. The backtesting framework uses sliding-window cross-validation borrowed from machine learning&mdash;the same technique used to validate time-series models, applied to an AI trading agent.
+  </p>
+
+  <div class="code-block my-8">
+<pre><span style="color:#888">// Sliding-window cross-validation: 30 days of hourly candles</span>
+
+Fold 1: [===== 25d train =====][== 5d test ==]
+Fold 2:   [===== 25d train =====][== 5d test ==]
+Fold 3:     [===== 25d train =====][== 5d test ==]
+
+<span style="color:#888">Each fold: Claude sees 25 days of history,</span>
+<span style="color:#888">makes decisions for the 5-day test window,</span>
+<span style="color:#888">PnL is simulated against actual prices.</span>
+<span style="color:#888">Alpha = agent return - buy-and-hold return.</span></pre>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The key metric is alpha&mdash;the return above or below what a simple buy-and-hold would have achieved. A positive alpha means the agent is adding value beyond the market's natural movement. The backtest measures this across multiple non-overlapping windows to prevent overfitting to a single favorable period.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    Win rate, alpha-positive rate, and cumulative alpha are tracked per commit. The entire calibration history is event-sourced through Git: every commit triggers a post-commit hook that runs the backtest, records the results in <code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">calibration.json</code>, and updates the GitHub Pages dashboard. If a code change causes the agent to regress, the dashboard shows it immediately.
+  </p>
+</article>
+
+<!-- ACT IV -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act IV</p>
+    <h2 class="font-headline text-3xl font-bold">The Dashboard</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    The live dashboard on GitHub Pages is the agent's public ledger. It shows a performance grade (A+ through F) based on rolling alpha, alongside key metrics: latest alpha percentage, win rate, alpha-positive rate, and total calibration runs. An alpha trend chart tracks performance across commits with green and red fill areas above and below zero.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The calibration history tab is the most interesting part. It displays every backtest result chronologically, tagged with the Git commit hash that triggered it. Each entry shows the commit message, the performance metrics, and whether the change improved or regressed the agent. The dashboard is not a marketing page. It is an audit trail rendered as HTML.
+  </p>
+
+  <div class="pull-quote my-10 py-6 px-2">
+    <p class="font-headline text-2xl italic text-center leading-snug">
+      The agent's track record is version-controlled.<br>
+      Every improvement is a commit. Every regression is visible.
+    </p>
+  </div>
+</article>
+
+<!-- ACT V -->
+<article class="mb-20">
+  <div class="text-center mb-8">
+    <p class="font-sans act-number uppercase tracking-[0.4em] text-wsj-caption mb-1">Act V</p>
+    <h2 class="font-headline text-3xl font-bold">The Discipline</h2>
+    <div class="w-16 h-0.5 bg-wsj-rule mx-auto mt-4"></div>
+  </div>
+
+  <p class="font-body text-lg leading-relaxed mb-5 drop-cap">
+    The project is not about whether Bitcoin will go up or down. It's about whether an AI agent can be held to the same standards as a human trader: transparent reasoning, auditable decisions, backtested performance, and honest reporting of losses. The bearish thesis is a constraint that makes the system interesting&mdash;it forces the agent to find opportunity in a market that broadly trends upward, which means it has to be right about timing and risk management.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The architecture choices reflect this discipline. SQLite stores every decision. Git hooks enforce regression testing. The dashboard publishes results automatically&mdash;good or bad. There is no cherry-picking of favorable periods. The sliding-window backtest prevents it structurally.
+  </p>
+  <p class="font-body text-lg leading-relaxed mb-5">
+    The most telling design choice: the agent runs on testnet by default. Going live requires explicit configuration (<code class="bg-wsj-light px-2 py-0.5 rounded text-base font-mono">DERIBIT_LIVE=true</code>) and the README carries a risk warning about unlimited loss on short positions. The system is designed to prove competence before deploying capital. That's the real thesis.
+  </p>
+</article>
+
+<!-- Closing -->
+<div class="border-t border-gray-300 pt-8 pb-4 flex justify-between items-center">
+  <a href="the-coding-gym.html" class="font-sans text-sm text-wsj-accent hover:underline">&larr; The Coding Gym</a>
+  <a href="../index.html" class="font-sans text-sm text-wsj-accent hover:underline">All posts &rarr;</a>
+</div>
+
+<div class="border-t-2 border-black pt-8 pb-12 text-center mt-4">
+  <p class="font-sans text-xs text-wsj-caption tracking-widest uppercase">
+    <a href="https://miguelemosreverte.github.io/anti-microstrategy-claude/" class="hover:text-wsj-accent">Live dashboard &rarr; miguelemosreverte.github.io/anti-microstrategy-claude</a>
+  </p>
+</div>
+
+</main>
+
+<footer class="border-t border-gray-300 py-6 text-center">
+  <p class="font-sans text-xs text-wsj-caption">
+    <a href="https://github.com/miguelemosreverte/claude-blog" class="hover:text-wsj-accent">github.com/miguelemosreverte/claude-blog</a>
+  </p>
+</footer>
+
+</body>
+</html>
